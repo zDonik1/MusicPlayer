@@ -46,9 +46,12 @@ android {
 
     defaultConfig {
       targetSdkVersion   androidCompileSdkVersion.toInteger()
-      applicationId    = productIdentifier
-      versionCode      = productVersionCode.toInteger()
-      versionName      = productVersionName
+
+      // for inexplicable reasons, this code snippet is giving erros when felgo
+      // project was moved to a sub-project
+//      applicationId    = productIdentifier
+//      versionCode      = productVersionCode.toInteger()
+//      versionName      = productVersionName
 
       int qtVersionNr = project.hasProperty("qtVersionInt") ? qtVersionInt.toInteger() : 5132
       if (qtVersionNr < 5140) {

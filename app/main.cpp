@@ -63,10 +63,13 @@ int main(int argc, char *argv[])
 {
     AppConnection connection;
     qDebug() << "~~~  try to bind service";
-    qDebug() << QtAndroid::bindService(
+    if (QtAndroid::bindService(
                     QAndroidIntent(QtAndroid::androidActivity(),
                                    "com.zdonik.musicplayer.PlayerService"),
-                    connection, QtAndroid::BindFlag::AutoCreate);
+                    connection, QtAndroid::BindFlag::AutoCreate))
+    {
+        qDebug() << "~~~  binding success";
+    }
 
     QApplication app(argc, argv);
     FelgoApplication felgo;
@@ -78,7 +81,6 @@ int main(int argc, char *argv[])
     felgo.initialize(&engine);
 
     felgo.setLicenseKey(PRODUCT_LICENSE_KEY);
-//    felgo.setMainQmlFileName(QStringLiteral("qml/Main.qml"));
     felgo.setMainQmlFileName(QStringLiteral("qrc:/qml/Main.qml"));
 
     engine.load(QUrl(felgo.mainQmlFileName()));

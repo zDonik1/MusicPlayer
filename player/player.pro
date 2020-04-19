@@ -1,7 +1,7 @@
 TEMPLATE = lib
 TARGET = player
 CONFIG += dll
-QT += core androidextras
+QT += core androidextras multimedia
 
 SOURCES += \
     player.cpp \
@@ -11,3 +11,6 @@ SOURCES += \
 HEADERS += \
     playerbinder.h \
     playerservice.h
+
+RESOURCES += \
+    resources.qrc
