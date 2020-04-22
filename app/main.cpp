@@ -9,6 +9,7 @@
 #include <QAndroidIntent>
 #include <QAndroidParcel>
 #include <QAndroidServiceConnection>
+#include <QAndroidJniObject>
 #include "appbinder.h"
 
 class AppConnection : public QAndroidServiceConnection
@@ -61,6 +62,14 @@ private:
 
 int main(int argc, char *argv[])
 {
+    qDebug() << "~~~ calling startService";
+    QAndroidJniObject::callStaticMethod<void>(
+                "com/zdonik/musicplayer/PlayerService",
+                "startMyService",
+                "(Landroid/content/Context;)V",
+                QtAndroid::androidActivity().object());
+    qDebug() << "~~~ ending call startService";
+
     AppConnection connection;
     qDebug() << "~~~  try to bind service";
     if (QtAndroid::bindService(
@@ -81,7 +90,7 @@ int main(int argc, char *argv[])
     felgo.initialize(&engine);
 
     felgo.setLicenseKey(PRODUCT_LICENSE_KEY);
-    felgo.setMainQmlFileName(QStringLiteral("qrc:/qml/Main.qml"));
+    felgo.setMainQmlFileName(QStringLiteral("qml/Main.qml"));
 
     engine.load(QUrl(felgo.mainQmlFileName()));
 
