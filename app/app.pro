@@ -27,7 +27,7 @@ DEPLOYMENTFOLDERS += assetsFolder
 
 # Add more folders to ship with the application here
 
-#RESOURCES += resources.qrc # uncomment for publishing
+RESOURCES += resources.qrc # uncomment for publishing
 
 # NOTE: for PUBLISHING, perform the following steps:
 # 1. comment the DEPLOYMENTFOLDERS += qmlFolder line above, to avoid shipping your qml files with the application (instead they get compiled to the app binary)
@@ -41,8 +41,14 @@ DEPLOYMENTFOLDERS += assetsFolder
 
 # The .cpp file which was generated for your project. Feel free to hack it.
 SOURCES += main.cpp \
-    appbinder.cpp
+    appbinder.cpp \
+    appconnection.cpp \
+    datamodel.cpp
 
+HEADERS += \
+    appbinder.h \
+    appconnection.h \
+    datamodel.h
 
 android {
     ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
@@ -62,8 +68,11 @@ macx {
     ICON = macx/app_icon.icns
 }
 
-HEADERS += \
-    appbinder.h
-
 DISTFILES += \
-    android/src/com/zdonik/musicplayer/PlayerService.java
+    android/src/com/zdonik/musicplayer/PlayerService.java \
+    qml/Logic.qml \
+    qml/components/MusicDelegate.qml \
+    qml/pages/PlayerPage.qml \
+    qml/pages/PlaylistsPage.qml
+
+INCLUDEPATH += ../player/common

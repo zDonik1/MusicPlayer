@@ -11,6 +11,7 @@ SOURCES += \
     playerservice.cpp
 
 HEADERS += \
+    common/messagetype.h \
     databasemanager.h \
     musicdao.h \
     playerbinder.h \

@@ -2,66 +2,20 @@
 #include <FelgoApplication>
 
 #include <QQmlApplicationEngine>
+#include <QQmlContext>
 
 #include <QDebug>
-#include <QColor>
 #include <QtAndroid>
 #include <QAndroidIntent>
-#include <QAndroidParcel>
-#include <QAndroidServiceConnection>
 #include <QAndroidJniObject>
-#include "appbinder.h"
 
-class AppConnection : public QAndroidServiceConnection
-{
-public:
-    void onServiceConnected(const QString &name, const QAndroidBinder &serviceBinder) override
-    {
-        qDebug() << "~~~  onServiceConnected" << name;
+#include "appconnection.h"
+#include "datamodel.h"
 
-        {
-            // test binder
-            QAndroidParcel sendData, replyData;
-            sendData.writeBinder(m_binder);
-            serviceBinder.transact(1, sendData, &replyData);
-            qDebug() << replyData.readVariant();
-        }
-
-        {
-            // test QVariant
-            QAndroidParcel sendData, replyData;
-            QVariantHash testData;
-            QVariantMap testMap;
-            testMap["1"] = QVariant("one");
-            testMap["2"] = QVariant("two");
-            testData["0"] = testMap;
-            testData["QString"] = QString("QString");
-            testData["QColor"] = QColor(Qt::red);
-            sendData.writeVariant(testData);
-            serviceBinder.transact(3, sendData, &replyData);
-            qDebug() << replyData.readVariant();
-        }
-
-        {
-            // test any data
-            QAndroidParcel sendData, replyData;
-            sendData.writeData("Here goes any data we like");
-            serviceBinder.transact(4, sendData, &replyData);
-            qDebug() << replyData.readVariant();
-        }
-    }
-
-    void onServiceDisconnected(const QString &name) override
-    {
-        qDebug() << "~~~  onServiceDisconnected" << name;
-    }
-
-private:
-    AppBinder m_binder;
-};
 
 int main(int argc, char *argv[])
 {
+    // Starting service
     qDebug() << "~~~ calling startService";
     QAndroidJniObject::callStaticMethod<void>(
                 "com/zdonik/musicplayer/PlayerService",
@@ -70,6 +24,7 @@ int main(int argc, char *argv[])
                 QtAndroid::androidActivity().object());
     qDebug() << "~~~ ending call startService";
 
+    // Connecting to service
     AppConnection connection;
     qDebug() << "~~~  try to bind service";
     if (QtAndroid::bindService(
@@ -80,13 +35,17 @@ int main(int argc, char *argv[])
         qDebug() << "~~~  binding success";
     }
 
+    // Initializing DataModel
+    DataModel dataModel(connection.getServerBinder());
+
+    // Initializing felgo application
     QApplication app(argc, argv);
     FelgoApplication felgo;
 
-    // Use platform-specific fonts instead of Felgo's default font
     felgo.setPreservePlatformFonts(true);
 
     QQmlApplicationEngine engine;
+    engine.rootContext()->setContextProperty("dataModel", &dataModel);
     felgo.initialize(&engine);
 
     felgo.setLicenseKey(PRODUCT_LICENSE_KEY);
