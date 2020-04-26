@@ -4,12 +4,16 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QJsonDocument>
-#include <QDir>
+#include <QStack>
 
 #include <messagetype.h>
 
-DataModel::DataModel(const QAndroidBinder &binder, QObject *parent)
+#include "dirdao.h"
+
+DataModel::DataModel(DatabaseManager &databaseManager,
+                     const QAndroidBinder &binder, QObject *parent)
     : QObject(parent)
+    , m_databaseManager(databaseManager)
     , m_binder(binder)
 {
 }
@@ -65,18 +69,33 @@ void DataModel::musicChanged(int index)
 
 void DataModel::refreshDirs()
 {
-    QAndroidParcel sendData, replyData;
-    m_binder.transact(MessageType::REFRESH_DIRS, sendData, &replyData);
-    QVariantMap dirContents = replyData.readVariant().toMap();
+    QStack<QDir> stack;
+    auto rootDirs = m_databaseManager.getDirDAO()->getAll();
+    for (auto dir : rootDirs) {
+        stack.push_back(dir);
+    }
+
+    // Recurssively traversing root dirs
+    while (!stack.empty()) {
+        QDir dir = stack.pop();
+        QStringList filenames = dir.entryList(QDir::Files);
+        if (!filenames.empty()) {
+            m_filenames[dir] = filenames;
+        }
+
+        QStringList dirNames = dir.entryList(QDir::Dirs
+                                             | QDir::NoDotAndDotDot);
+        for (auto dirName : dirNames) {
+            stack.push_back(QDir(dir.absolutePath() + "/" + dirName));
+        }
+    }
 
     QJsonArray fileList;
-    auto keys = dirContents.keys();
-    for (const auto &key : keys) {
-        auto values = dirContents[key].toList();
-        for (const auto &file : values) {
+    for (const auto &pair : m_filenames) {
+        for (const auto &filename : pair.second) {
             QJsonObject musicFile;
-            musicFile["dir"] = QDir(key).dirName();
-            musicFile["filename"] = file.toString();
+            musicFile["dir"] = pair.first.dirName();
+            musicFile["filename"] = filename;
             fileList.push_back(musicFile);
         }
     }

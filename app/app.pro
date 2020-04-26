@@ -43,12 +43,19 @@ RESOURCES += resources.qrc # uncomment for publishing
 SOURCES += main.cpp \
     appbinder.cpp \
     appconnection.cpp \
-    datamodel.cpp
+    databasemanager.cpp \
+    datamodel.cpp \
+    dirdao.cpp \
+    musicdao.cpp
 
 HEADERS += \
+    abstractdao.h \
     appbinder.h \
     appconnection.h \
-    datamodel.h
+    databasemanager.h \
+    datamodel.h \
+    dirdao.h \
+    musicdao.h
 
 android {
     ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android

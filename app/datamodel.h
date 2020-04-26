@@ -3,6 +3,9 @@
 #include <QObject>
 #include <QAndroidBinder>
 #include <QQmlListProperty>
+#include <QDir>
+
+#include "databasemanager.h"
 
 class DataModel : public QObject
 {
@@ -11,7 +14,8 @@ class DataModel : public QObject
     Q_PROPERTY(QString dirModel READ getDirModel NOTIFY dirModelChanged)
 
 public:
-    explicit DataModel(const QAndroidBinder &binder, QObject *parent = nullptr);
+    explicit DataModel(DatabaseManager &databaseManager,
+                       const QAndroidBinder &binder, QObject *parent = nullptr);
 
     QString &getDirModel();
 
@@ -23,13 +27,16 @@ public slots:
     void shuffle();
     void repeat();
     void musicChanged(int index);
+
     void refreshDirs();
 
 signals:
     void dirModelChanged();
 
 private:
+    DatabaseManager &m_databaseManager;
     const QAndroidBinder &m_binder;
 
     QString m_dirModel;
+    std::map<QDir, std::vector<QString>> m_files;
 };

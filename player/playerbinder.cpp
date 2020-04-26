@@ -46,31 +46,6 @@ bool PlayerBinder::onTransact(int code, const QAndroidParcel &data,
     case MessageType::MUSIC_CHANGED: {
         break;
     }
-
-    case MessageType::REFRESH_DIRS: {
-        QStack<QDir> stack;
-        auto rootDirs = m_databaseMgr.getDirDAO()->getAll();
-        for (auto dir : rootDirs) {
-            stack.push_back(dir);
-        }
-
-        while (!stack.empty()) {
-            QDir dir = stack.pop();
-            QStringList fileNames = dir.entryList(QDir::Files);
-            if (!fileNames.empty()) {
-                m_filenames[dir.absolutePath()] = fileNames;
-            }
-
-            QStringList dirNames = dir.entryList(QDir::Dirs
-                                                 | QDir::NoDotAndDotDot);
-            for (auto dirName : dirNames) {
-                stack.push_back(QDir(dir.absolutePath() + "/" + dirName));
-            }
-        }
-
-        reply.writeVariant(m_filenames);
-        break;
-    }
     }
     return true;
 }

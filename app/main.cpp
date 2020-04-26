@@ -36,7 +36,8 @@ int main(int argc, char *argv[])
     }
 
     // Initializing DataModel
-    DataModel dataModel(connection.getServerBinder());
+    DatabaseManager databaseManager;
+    DataModel dataModel(databaseManager, connection.getServerBinder());
 
     // Initializing felgo application
     QApplication app(argc, argv);
