@@ -56,7 +56,8 @@ App {
                     title: qsTr("Files")
 
                     AppListView {
-
+                        model: dataModel.dirModel
+                        // make ui for dirs and sections
                     }
                 }
             }

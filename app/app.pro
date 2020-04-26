@@ -75,4 +75,4 @@ DISTFILES += \
     qml/pages/PlayerPage.qml \
     qml/pages/PlaylistsPage.qml
 
-INCLUDEPATH += ../player/common
+INCLUDEPATH += ../common

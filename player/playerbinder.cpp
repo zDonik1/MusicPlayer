@@ -2,6 +2,16 @@
 
 #include <QDebug>
 #include <QAndroidParcel>
+#include <QStack>
+
+#include <messagetype.h>
+
+#include "dirdao.h"
+
+PlayerBinder::PlayerBinder(DatabaseManager &databaseMgr)
+    : m_databaseMgr(databaseMgr)
+{
+}
 
 bool PlayerBinder::onTransact(int code, const QAndroidParcel &data,
                               const QAndroidParcel &reply,
@@ -9,28 +19,58 @@ bool PlayerBinder::onTransact(int code, const QAndroidParcel &data,
 {
     qDebug() << "~~~  onTransact" << code << int(flags);
     switch (code) {
-    case 1: {
-        QAndroidBinder binder = data.readBinder();
-        qDebug() << "~~~  onTransact client sent its binder !";
-
-        // use it to sendback some data
-        QAndroidParcel someData, myreply;
-        someData.writeVariant(QVariant("Data from server"));
-        binder.transact(2, someData, &myreply);
-        qDebug() << "~~~  onTransact reply for client's binder" << myreply.readData();
-        reply.writeVariant(11);
+    case MessageType::PLAY: {
+        break;
     }
-        break;
 
-    case 3:
-        qDebug() << "~~~  onTransact client sent a QVariant" << data.readVariant();
-        reply.writeVariant(33);
+    case MessageType::NEXT: {
         break;
+    }
 
-    default:
-        qDebug() << "~~~  onTransact client sent unknow data" << data.readData();
-        reply.writeVariant(555);
+    case MessageType::PREVIOUS: {
         break;
+    }
+
+    case MessageType::SEEK: {
+        break;
+    }
+
+    case MessageType::SHUFFLE: {
+        break;
+    }
+
+    case MessageType::REPEAT: {
+        break;
+    }
+
+    case MessageType::MUSIC_CHANGED: {
+        break;
+    }
+
+    case MessageType::REFRESH_DIRS: {
+        QStack<QDir> stack;
+        auto rootDirs = m_databaseMgr.getDirDAO()->getAll();
+        for (auto dir : rootDirs) {
+            stack.push_back(dir);
+        }
+
+        while (!stack.empty()) {
+            QDir dir = stack.pop();
+            QStringList fileNames = dir.entryList(QDir::Files);
+            if (!fileNames.empty()) {
+                m_filenames[dir.absolutePath()] = fileNames;
+            }
+
+            QStringList dirNames = dir.entryList(QDir::Dirs
+                                                 | QDir::NoDotAndDotDot);
+            for (auto dirName : dirNames) {
+                stack.push_back(QDir(dir.absolutePath() + "/" + dirName));
+            }
+        }
+
+        reply.writeVariant(m_filenames);
+        break;
+    }
     }
     return true;
 }

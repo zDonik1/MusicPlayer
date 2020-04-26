@@ -1,0 +1,39 @@
+#include "dirdao.h"
+
+#include <QSqlQuery>
+#include <QVariant>
+
+DirDAO::DirDAO(QSqlDatabase &database)
+    : AbstractDAO(database)
+{
+}
+
+DirDAO::~DirDAO()
+{
+}
+
+void DirDAO::init()
+{
+    if (!m_database.tables().contains(tableName())) {
+        QSqlQuery query(m_database);
+        query.exec("create table " + tableName() + "("
+                   "id integer primary key autoincrement,"
+                   "path text"
+                   ")");
+    }
+
+    QSqlQuery dirs = m_database.exec("select path from rootdirs");
+    while (dirs.next()) {
+        m_rootDirs.push_back(QDir(dirs.value(0).toString()));
+    }
+}
+
+QString DirDAO::tableName()
+{
+    return "rootdirs";
+}
+
+const std::vector<QDir> &DirDAO::getAll() const
+{
+    return m_rootDirs;
+}
