@@ -52,13 +52,7 @@ App {
             icon: IconType.file
 
             NavigationStack {
-                Page {
-                    title: qsTr("Files")
-
-                    AppListView {
-                        model: dataModel.dirModel
-                        // make ui for dirs and sections
-                    }
+                FilePage {
                 }
             }
         }

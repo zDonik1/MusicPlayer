@@ -90,6 +90,7 @@ void DataModel::refreshDirs()
         }
     }
 
+    // Converting map to json array
     QJsonArray fileList;
     for (const auto &pair : m_filenames) {
         for (const auto &filename : pair.second) {

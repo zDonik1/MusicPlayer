@@ -38,5 +38,5 @@ private:
     const QAndroidBinder &m_binder;
 
     QString m_dirModel;
-    std::map<QDir, std::vector<QString>> m_files;
+    std::map<QDir, QStringList> m_filenames;
 };

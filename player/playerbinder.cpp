@@ -6,13 +6,6 @@
 
 #include <messagetype.h>
 
-#include "dirdao.h"
-
-PlayerBinder::PlayerBinder(DatabaseManager &databaseMgr)
-    : m_databaseMgr(databaseMgr)
-{
-}
-
 bool PlayerBinder::onTransact(int code, const QAndroidParcel &data,
                               const QAndroidParcel &reply,
                               QAndroidBinder::CallType flags)
