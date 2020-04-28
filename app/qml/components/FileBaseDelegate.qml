@@ -3,6 +3,7 @@ import Felgo 3.0
 
 Item {
     signal clicked()
+    signal optionsClicked()
 
     property alias icon: icon.icon
     property alias text: textName.text
@@ -46,6 +47,13 @@ Item {
         elide: Text.ElideRight
     }
 
+    RippleMouseArea {
+        anchors.fill: parent
+        circularBackground: false
+
+        onClicked: root.clicked()
+    }
+
     Item {
         id: menuButtonContainer
         anchors {
@@ -66,7 +74,7 @@ Item {
             radius: dp(30)
             touchPoint: Qt.point(width / 2, height / 2)
 
-            onClicked: root.clicked()
+            onClicked: root.optionsClicked()
         }
     }
 

@@ -80,7 +80,7 @@ void DataModel::refreshDirs()
         QDir dir = stack.pop();
         QStringList filenames = dir.entryList(QDir::Files);
         if (!filenames.empty()) {
-            m_filenames[dir] = filenames;
+            m_filenames.emplace(dir.absolutePath(), filenames);
         }
 
         QStringList dirNames = dir.entryList(QDir::Dirs
@@ -95,7 +95,7 @@ void DataModel::refreshDirs()
     for (const auto &pair : m_filenames) {
         for (const auto &filename : pair.second) {
             QJsonObject musicFile;
-            musicFile["dir"] = pair.first.dirName();
+            musicFile["dir"] = QDir(pair.first).dirName();
             musicFile["filename"] = filename;
             fileList.push_back(musicFile);
         }

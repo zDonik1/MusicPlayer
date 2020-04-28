@@ -30,19 +30,45 @@ Page {
         }
     }
     AppListView {
+        property string dirToggled: ""
+        property int closeDuration: 200
+
+        onDirToggledChanged: resetTimer.start()
+
         id: listFile
 //        model: dataModel.dirModel
         model: fileModel
 
         delegate: FileDelegate {
             text: filename
+            visible: height !== 0
+            animDuration: listFile.closeDuration
+
+            onOptionsClicked: console.log("options opened")
+
+            Connections {
+                target: listFile
+
+                onDirToggledChanged:
+                    if (listFile.dirToggled === dir)
+                        state = (state === "closed") ? "opened" : "closed"
+            }
         }
 
         section {
             property: "dir"
             delegate: DirDelegate {
                 text: section
+
+                onOpenChanged: listFile.dirToggled = section
             }
         }
+    }
+
+    Timer {
+        id: resetTimer
+        interval: listFile.closeDuration
+
+        onTriggered: listFile.dirToggled = ""
     }
 }
