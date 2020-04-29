@@ -36,8 +36,8 @@ Page {
         onDirToggledChanged: resetTimer.start()
 
         id: listFile
-//        model: dataModel.dirModel
-        model: fileModel
+        model: dataModel.dirModel
+//        model: fileModel
 
         delegate: FileDelegate {
             text: filename

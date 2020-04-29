@@ -82,7 +82,7 @@ Item {
             color: Theme.secondaryTextColor
             y: dp(13)
             text: musicDuration
-            fontSize: sp(14)
+            fontSize: 14
         }
     }
 

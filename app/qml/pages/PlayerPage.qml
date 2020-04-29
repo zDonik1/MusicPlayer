@@ -4,6 +4,7 @@ import Felgo 3.0
 import "../components"
 
 Page {
+    id: root
     title: qsTr("Music Player")
 
     ListModel {
@@ -74,6 +75,7 @@ Page {
             AppButton {
                 icon: IconType.random
                 flat: true
+                minimumWidth: root.width / 5
                 textColor: Theme.disabledColor
 
                 onClicked: logic.shuffle()
@@ -82,6 +84,7 @@ Page {
             AppButton {
                 icon: IconType.stepbackward
                 flat: true
+                minimumWidth: root.width / 5
 
                 onClicked: logic.previous()
             }
@@ -89,6 +92,7 @@ Page {
             AppButton {
                 icon: IconType.play
                 flat: true
+                minimumWidth: root.width / 5
 
                 onClicked: logic.play()
             }
@@ -96,6 +100,7 @@ Page {
             AppButton {
                 icon: IconType.stepforward
                 flat: true
+                minimumWidth: root.width / 5
 
                 onClicked: logic.next()
             }
@@ -103,6 +108,7 @@ Page {
             AppButton {
                 icon: IconType.undo
                 flat: true
+                minimumWidth: root.width / 5
                 textColor: Theme.disabledColor
 
                 onClicked: logic.repeat()

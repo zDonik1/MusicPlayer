@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
     QMediaPlayer player;
     player.setMedia(QUrl("qrc:/res/Generdyn - Destiny (ft. Krigare).mp3"));
     player.setVolume(50);
-    player.play();
+//    player.play();
     qDebug() << "~~~ Started playing the best track";
 
     return app.exec();

@@ -19,4 +19,6 @@ public:
 private:
     QSqlDatabase m_database;
     std::map<QString, std::unique_ptr<AbstractDAO>> m_daos;
+
+    const QString DB_FILENAME = "music.db";
 };

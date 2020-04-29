@@ -9,17 +9,31 @@
 using namespace std;
 
 DatabaseManager::DatabaseManager()
+    : m_database(QSqlDatabase::addDatabase("QSQLITE"))
 {
-    m_database.addDatabase("QSQLITE");
-    m_database.setDatabaseName(QStandardPaths::writableLocation(
-                                   QStandardPaths::AppDataLocation) + "/");
+    // TODO: debug this whole function
+    QFile assetDbFile(":/" + DB_FILENAME);
+    QString destinationDbFile
+        = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)
+              .append("/" + DB_FILENAME);
+    qDebug() << "assetdbfile:" << assetDbFile.fileName();
+    qDebug() << "destionationDbFile:" << destinationDbFile;
+
+    if (!QFile::exists(destinationDbFile)) {
+        qDebug() << "Db file doesn't exist";
+        if (!assetDbFile.copy(destinationDbFile))
+            qDebug() << "Couldn't copy db file";
+        QFile::setPermissions(destinationDbFile, QFile::WriteOwner
+                                                     | QFile::ReadOwner);
+    }
 
     QString pathToDb = QStandardPaths::standardLocations(
                 QStandardPaths::AppDataLocation).first();
     QDir dir;
     dir.mkpath(pathToDb);
 
-    m_database.setDatabaseName(pathToDb + "/music");
+    m_database.setDatabaseName(pathToDb + "/" + DB_FILENAME);
+    qDebug() << "database name: " << m_database.databaseName();
     if (!m_database.open()) {
         qDebug() << "Could not open database";
     }
@@ -29,8 +43,6 @@ DatabaseManager::DatabaseManager()
     for (const auto &pair : m_daos) {
         pair.second->init();
     }
-
-    // TODO: copy db file to appdatalocation for android and ios
 }
 
 QSqlDatabase &DatabaseManager::getDatabase()
