@@ -51,6 +51,8 @@ App {
             title: qsTr("Files")
             icon: IconType.file
 
+            onSelected: dataModel.refreshDirs()
+
             NavigationStack {
                 FilePage {
                 }

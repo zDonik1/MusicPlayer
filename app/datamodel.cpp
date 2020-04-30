@@ -5,6 +5,7 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QStack>
+#include <QDebug>
 
 #include <messagetype.h>
 
@@ -69,16 +70,20 @@ void DataModel::musicChanged(int index)
 
 void DataModel::refreshDirs()
 {
+    qDebug() << "Refresh dirs called";
     QStack<QDir> stack;
     auto rootDirs = m_databaseManager.getDirDAO()->getAll();
     for (auto dir : rootDirs) {
+        qDebug() << "dir:" << dir;
         stack.push_back(dir);
     }
 
     // Recurssively traversing root dirs
     while (!stack.empty()) {
         QDir dir = stack.pop();
-        QStringList filenames = dir.entryList(QDir::Files);
+        QStringList filters;
+        filters << "*.mp3" << "*.m4a" << "*.wav";
+        QStringList filenames = dir.entryList(filters, QDir::Files);
         if (!filenames.empty()) {
             m_filenames.emplace(dir.absolutePath(), filenames);
         }
@@ -100,5 +105,7 @@ void DataModel::refreshDirs()
             fileList.push_back(musicFile);
         }
     }
-    m_dirModel = QJsonDocument(fileList).toJson();
+    m_dirModel = QJsonDocument(fileList).toJson(
+                QJsonDocument::JsonFormat::Compact);
+    emit dirModelChanged();
 }

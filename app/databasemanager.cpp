@@ -11,16 +11,12 @@ using namespace std;
 DatabaseManager::DatabaseManager()
     : m_database(QSqlDatabase::addDatabase("QSQLITE"))
 {
-    // TODO: debug this whole function
     QFile assetDbFile(":/" + DB_FILENAME);
     QString destinationDbFile
         = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)
               .append("/" + DB_FILENAME);
-    qDebug() << "assetdbfile:" << assetDbFile.fileName();
-    qDebug() << "destionationDbFile:" << destinationDbFile;
 
     if (!QFile::exists(destinationDbFile)) {
-        qDebug() << "Db file doesn't exist";
         if (!assetDbFile.copy(destinationDbFile))
             qDebug() << "Couldn't copy db file";
         QFile::setPermissions(destinationDbFile, QFile::WriteOwner
