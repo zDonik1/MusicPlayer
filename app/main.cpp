@@ -12,9 +12,10 @@
 #include "appconnection.h"
 #include "datamodel.h"
 
-
 int main(int argc, char *argv[])
 {
+    qmlRegisterType<DirModel>("Models", 1, 0, "DirModel");
+
     // Starting service
     qDebug() << "~~~ calling startService";
     QAndroidJniObject::callStaticMethod<void>(

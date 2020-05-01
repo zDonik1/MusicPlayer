@@ -29,6 +29,7 @@ Page {
             filename: "favorite two"
         }
     }
+
     AppListView {
         property string dirToggled: ""
         property int closeDuration: 200
@@ -36,7 +37,7 @@ Page {
         onDirToggledChanged: resetTimer.start()
 
         id: listFile
-        model: fileModel
+        model: dataModel.dirModel
 
         delegate: FileDelegate {
             text: filename

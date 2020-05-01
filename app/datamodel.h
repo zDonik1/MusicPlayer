@@ -6,18 +6,19 @@
 #include <QDir>
 
 #include "databasemanager.h"
+#include "dirmodel.h"
 
 class DataModel : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(QString dirModel READ getDirModel NOTIFY dirModelChanged)
+    Q_PROPERTY(DirModel *dirModel READ getDirModel NOTIFY dirModelChanged)
 
 public:
     explicit DataModel(DatabaseManager &databaseManager,
                        const QAndroidBinder &binder, QObject *parent = nullptr);
 
-    QString &getDirModel();
+    DirModel *getDirModel();
 
 public slots:
     void play();
@@ -37,6 +38,5 @@ private:
     DatabaseManager &m_databaseManager;
     const QAndroidBinder &m_binder;
 
-    QString m_dirModel;
-    std::map<QString, QStringList> m_filenames;
+    DirModel m_dirModel;
 };

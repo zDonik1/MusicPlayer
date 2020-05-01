@@ -46,6 +46,7 @@ SOURCES += main.cpp \
     databasemanager.cpp \
     datamodel.cpp \
     dirdao.cpp \
+    dirmodel.cpp \
     musicdao.cpp
 
 HEADERS += \
@@ -55,6 +56,7 @@ HEADERS += \
     databasemanager.h \
     datamodel.h \
     dirdao.h \
+    dirmodel.h \
     musicdao.h
 
 android {

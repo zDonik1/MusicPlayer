@@ -19,9 +19,9 @@ DataModel::DataModel(DatabaseManager &databaseManager,
 {
 }
 
-QString &DataModel::getDirModel()
+DirModel *DataModel::getDirModel()
 {
-    return m_dirModel;
+    return &m_dirModel;
 }
 
 void DataModel::play()
@@ -79,13 +79,14 @@ void DataModel::refreshDirs()
     }
 
     // Recurssively traversing root dirs
+    std::map<QString, QStringList> dirFilesMap;
     while (!stack.empty()) {
         QDir dir = stack.pop();
         QStringList filters;
         filters << "*.mp3" << "*.m4a" << "*.wav";
         QStringList filenames = dir.entryList(filters, QDir::Files);
         if (!filenames.empty()) {
-            m_filenames.emplace(dir.absolutePath(), filenames);
+            dirFilesMap.emplace(dir.absolutePath(), filenames);
         }
 
         QStringList dirNames = dir.entryList(QDir::Dirs
@@ -95,17 +96,5 @@ void DataModel::refreshDirs()
         }
     }
 
-    // Converting map to json array
-    QJsonArray fileList;
-    for (const auto &pair : m_filenames) {
-        for (const auto &filename : pair.second) {
-            QJsonObject musicFile;
-            musicFile["dir"] = QDir(pair.first).dirName();
-            musicFile["filename"] = filename;
-            fileList.push_back(musicFile);
-        }
-    }
-    m_dirModel = QJsonDocument(fileList).toJson(
-                QJsonDocument::JsonFormat::Compact);
-    emit dirModelChanged();
+    m_dirModel.setDirFilesMap(dirFilesMap);
 }
