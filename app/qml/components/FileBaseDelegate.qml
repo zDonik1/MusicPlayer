@@ -8,6 +8,9 @@ Item {
     property alias icon: icon.icon
     property alias text: textName.text
     property alias backgroundColor: background.color
+    property alias iconItem: icon
+    property alias textItem: textName
+    property bool open: true
 
     id: root
     width: parent.width
@@ -42,7 +45,7 @@ Item {
             right: menuButtonContainer.left
             verticalCenter: parent.verticalCenter
         }
-        lineHeight: 1.2
+        wrapMode: Text.NoWrap
         fontSize: Theme.listItem.fontSizeText
         elide: Text.ElideRight
     }

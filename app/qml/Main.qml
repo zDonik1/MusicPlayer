@@ -48,6 +48,7 @@ App {
         }
 
         NavigationItem {
+            id: navItemFile
             title: qsTr("Files")
             icon: IconType.file
 

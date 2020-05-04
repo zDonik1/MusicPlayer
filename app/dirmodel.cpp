@@ -4,7 +4,6 @@
 
 DirModel::DirModel()
 {
-
 }
 
 void DirModel::setDirFilesMap(const std::map<QString, QStringList> &map)
@@ -56,7 +55,7 @@ QVariant DirModel::data(const QModelIndex &index, int role) const
 QHash<int, QByteArray> DirModel::roleNames() const
 {
     QHash<int, QByteArray> roles;
-    roles[Roles::DirRole] = "dir";
-    roles[Roles::FilenameRole] = "filename";
+    roles[Roles::DirRole] = "rDir";
+    roles[Roles::FilenameRole] = "rFilename";
     return roles;
 }
