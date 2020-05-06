@@ -1,63 +1,59 @@
 import QtQuick 2.0
 import Felgo 3.0
+import QtQuick.Controls 1.4
+import QtQuick.Controls.Styles 1.4
 
 import "../components"
 
 Page {
     title: qsTr("Files")
 
-    ListModel {
-        id: fileModel
-        ListElement {
-            dir: "somedir"
-            filename: "my first music"
-        }
-        ListElement {
-            dir: "somedir"
-            filename: "my second music"
-        }
-        ListElement {
-            dir: "somedir"
-            filename: "my third music"
-        }
-        ListElement {
-            dir: "otherdir"
-            filename: "favorite one"
-        }
-        ListElement {
-            dir: "otherdir"
-            filename: "favorite two"
-        }
-    }
-
-    AppListView {
-
+    TreeView {
         property int currentSectionIndex: 0
 
-        id: listFile
-        scrollIndicatorVisible: true
-//        model: fileModel
+        id: treeFile
+        anchors.fill: parent
         model: dataModel.dirModel
 
-        delegate: FileDelegate {
-            property string dir: rDir
+        itemDelegate: FileBaseDelegate {
+            property bool isFolder: styleData.depth === 0
+            icon: isFolder
+                  ? (styleData.isExpanded
+                     ? IconType.folderopen
+                     : IconType.folder)
+                  : IconType.fileaudioo
+            text: styleData.value
 
-            text: rFilename
-            animDuration: 200
-
-            onOptionsClicked: console.log(index + " options clicked")
+            onClicked: {
+                if (isFolder) {
+                    if (styleData.isExpanded)
+                        treeFile.collapse(styleData.index)
+                    else
+                        treeFile.expand(styleData.index)
+                }
+            }
         }
 
-        section {
-            property: "rDir"
-            delegate: DirDelegate {
-                text: section
+        rowDelegate: Item {
+            height: dp(55)
+        }
 
-                onOpenChanged: {
-                    for (var i = 0; i < listFile.count; ++i)
-                        if (listFile.itemAtIndex(i).dir === section)
-                            listFile.itemAtIndex(i).open = open
-                }
+        headerDelegate: Item {
+            height: 0
+            visible: false
+        }
+
+        TableViewColumn {
+            title: "Filename"
+            role: "rDisplay"
+            width: parent.width
+        }
+
+        TreeViewStyle {
+            control: parent
+
+            branchDelegate: Item {
+                visible: false
             }
         }
     }

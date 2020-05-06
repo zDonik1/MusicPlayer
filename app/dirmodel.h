@@ -1,27 +1,27 @@
 #pragma once
 
-#include <QAbstractListModel>
+#include <QAbstractItemModel>
 
-class DirModel : public QAbstractListModel
+class TreeFileNode;
+
+class DirModel : public QAbstractItemModel
 {
     Q_OBJECT
 
 public:
-    enum Roles {
-        DirRole = Qt::UserRole,
-        FilenameRole
-    };
-
-public:
-    DirModel();
+    DirModel(QObject *parent = nullptr);
+    ~DirModel();
 
     void setDirFilesMap(const std::map<QString, QStringList> &map);
 
+    QVariant data(const QModelIndex &index, int role) const override;
+    QModelIndex index(int row, int column,
+                      const QModelIndex &parent = QModelIndex()) const override;
+    QModelIndex parent(const QModelIndex &child) const override;
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
-    QVariant data(const QModelIndex &index,
-                  int role = Qt::DisplayRole) const override;
+    int columnCount(const QModelIndex &parent = QModelIndex()) const override;
     QHash<int, QByteArray> roleNames() const override;
 
 private:
-    std::map<QString, QStringList> m_dirFilesMap;
+    TreeFileNode *m_root;
 };

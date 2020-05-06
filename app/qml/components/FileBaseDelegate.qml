@@ -10,7 +10,6 @@ Item {
     property alias backgroundColor: background.color
     property alias iconItem: icon
     property alias textItem: textName
-    property bool open: true
 
     id: root
     width: parent.width
