@@ -6,59 +6,24 @@ import "../components"
 Page {
     title: qsTr("Files")
 
-    ListModel {
-        id: fileModel
-        ListElement {
-            dir: "somedir"
-            filename: "my first music"
-        }
-        ListElement {
-            dir: "somedir"
-            filename: "my second music"
-        }
-        ListElement {
-            dir: "somedir"
-            filename: "my third music"
-        }
-        ListElement {
-            dir: "otherdir"
-            filename: "favorite one"
-        }
-        ListElement {
-            dir: "otherdir"
-            filename: "favorite two"
-        }
-    }
-
     AppListView {
-
-        property int currentSectionIndex: 0
-
         id: listFile
         scrollIndicatorVisible: true
-//        model: fileModel
         model: dataModel.dirModel
 
-        delegate: FileDelegate {
-            property string dir: rDir
+        delegate: FileBaseDelegate {
+            icon: r_isDir
+                  ? (open ? IconType.folderopen : IconType.folder)
+                  : IconType.fileaudioo
+            text: r_name
+            height: r_isDir ? dp(55) : (open ? dp(55) : 0)
+            visible: r_isDir ? true : height !== 0
+            backgroundColor: r_isDir ? Qt.lighter(Qt.lighter(Theme.tintColor))
+                                     : Theme.backgroundColor
+            open: r_isOpen
 
-            text: rFilename
-            animDuration: 200
-
-            onOptionsClicked: console.log(index + " options clicked")
-        }
-
-        section {
-            property: "rDir"
-            delegate: DirDelegate {
-                text: section
-
-                onOpenChanged: {
-                    for (var i = 0; i < listFile.count; ++i)
-                        if (listFile.itemAtIndex(i).dir === section)
-                            listFile.itemAtIndex(i).open = open
-                }
-            }
+            onClicked: if (r_isDir)
+                           logic.dirToggled(index)
         }
     }
 }

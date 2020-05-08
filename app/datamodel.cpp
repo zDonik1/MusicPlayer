@@ -96,5 +96,10 @@ void DataModel::refreshDirs()
         }
     }
 
-    m_dirModel.setDirFilesMap(dirFilesMap);
+    m_dirModel.setupModel(dirFilesMap);
+}
+
+void DataModel::toggleDir(int index)
+{
+    m_dirModel.toggleDir(index);
 }

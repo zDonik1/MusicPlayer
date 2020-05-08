@@ -15,6 +15,7 @@ Item {
     id: root
     width: parent.width
     height: dp(55)
+    clip: true
 
     Rectangle {
         id: background

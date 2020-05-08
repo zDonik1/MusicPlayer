@@ -24,6 +24,8 @@ App {
         onShuffle: dataModel.shuffle()
         onRepeat: dataModel.repeat()
         onMusicChanged: dataModel.musicChanged(index)
+
+        onDirToggled: dataModel.toggleDir(index)
     }
 
     Navigation {

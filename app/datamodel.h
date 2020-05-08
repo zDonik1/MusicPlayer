@@ -30,6 +30,7 @@ public slots:
     void musicChanged(int index);
 
     void refreshDirs();
+    void toggleDir(int index);
 
 signals:
     void dirModelChanged();

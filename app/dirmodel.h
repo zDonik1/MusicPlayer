@@ -8,14 +8,16 @@ class DirModel : public QAbstractListModel
 
 public:
     enum Roles {
-        DirRole = Qt::UserRole,
-        FilenameRole
+        IsDirRole = Qt::UserRole,
+        IsOpen,
+        NameRole,
     };
 
 public:
     DirModel();
 
-    void setDirFilesMap(const std::map<QString, QStringList> &map);
+    void setupModel(const std::map<QString, QStringList> &map);
+    void toggleDir(int index);
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     QVariant data(const QModelIndex &index,
@@ -23,5 +25,6 @@ public:
     QHash<int, QByteArray> roleNames() const override;
 
 private:
-    std::map<QString, QStringList> m_dirFilesMap;
+    // hash contains filename [QString], isDir [bool], isOpen[bool]
+    std::vector<QVariantHash> m_entryInfo;
 };

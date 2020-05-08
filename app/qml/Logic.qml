@@ -8,4 +8,6 @@ Item {
     signal shuffle()
     signal repeat()
     signal musicChanged(int index)
+
+    signal dirToggled(int index)
 }

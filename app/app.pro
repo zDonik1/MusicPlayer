@@ -80,9 +80,7 @@ macx {
 DISTFILES += \
     android/src/com/zdonik/musicplayer/PlayerService.java \
     qml/Logic.qml \
-    qml/components/DirDelegate.qml \
     qml/components/FileBaseDelegate.qml \
-    qml/components/FileDelegate.qml \
     qml/components/MusicDelegate.qml \
     qml/pages/FilePage.qml \
     qml/pages/PlayerPage.qml \
