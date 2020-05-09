@@ -5,6 +5,8 @@
 #include <QDir>
 
 #include "dirdao.h"
+#include "playlistdao.h"
+#include "musicdao.h"
 
 using namespace std;
 
@@ -34,7 +36,10 @@ DatabaseManager::DatabaseManager()
         qDebug() << "Could not open database";
     }
 
+    // setting up daos
     m_daos["dir"] = make_unique<DirDAO>(m_database);
+    m_daos["playlist"] = make_unique<PlaylistDAO>(m_database);
+    m_daos["music"] = make_unique<MusicDAO>(m_database);
 
     for (const auto &pair : m_daos) {
         pair.second->init();
@@ -46,7 +51,17 @@ QSqlDatabase &DatabaseManager::getDatabase()
     return m_database;
 }
 
-const DirDAO *DatabaseManager::getDirDAO()
+const DirDAO *DatabaseManager::getDirDAO() const
 {
-    return dynamic_cast<DirDAO *>(m_daos["dir"].get());
+    return dynamic_cast<DirDAO *>(m_daos.at("dir").get());
+}
+
+const PlaylistDAO *DatabaseManager::getPlaylistDAO() const
+{
+    return dynamic_cast<PlaylistDAO *>(m_daos.at("playlist").get());
+}
+
+const MusicDAO *DatabaseManager::getMusicDAO() const
+{
+    return dynamic_cast<MusicDAO *>(m_daos.at("music").get());
 }

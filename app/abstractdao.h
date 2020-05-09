@@ -3,6 +3,12 @@
 #include <QString>
 #include <QSqlDatabase>
 
+#include <exception>
+
+class invalid_input : public std::bad_exception
+{
+};
+
 class AbstractDAO
 {
 public:
@@ -16,7 +22,7 @@ public:
     }
 
     virtual void init() = 0;
-    virtual QString tableName() = 0;
+    virtual QString tableName() const = 0;
 
 protected:
     QSqlDatabase &m_database;

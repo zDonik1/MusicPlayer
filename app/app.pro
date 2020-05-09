@@ -47,7 +47,8 @@ SOURCES += main.cpp \
     datamodel.cpp \
     dirdao.cpp \
     dirmodel.cpp \
-    musicdao.cpp
+    musicdao.cpp \
+    playlistdao.cpp
 
 HEADERS += \
     abstractdao.h \
@@ -57,7 +58,10 @@ HEADERS += \
     datamodel.h \
     dirdao.h \
     dirmodel.h \
-    musicdao.h
+    music.h \
+    musicdao.h \
+    playlist.h \
+    playlistdao.h
 
 android {
     ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android

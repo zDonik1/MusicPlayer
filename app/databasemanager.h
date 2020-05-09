@@ -7,6 +7,8 @@
 #include "abstractdao.h"
 
 class DirDAO;
+class PlaylistDAO;
+class MusicDAO;
 
 class DatabaseManager
 {
@@ -14,7 +16,9 @@ public:
     DatabaseManager();
 
     QSqlDatabase &getDatabase();
-    const DirDAO *getDirDAO();
+    const DirDAO *getDirDAO() const;
+    const PlaylistDAO *getPlaylistDAO() const;
+    const MusicDAO *getMusicDAO() const;
 
 private:
     QSqlDatabase m_database;

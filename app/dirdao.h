@@ -12,7 +12,7 @@ public:
     ~DirDAO() override;
 
     void init() override;
-    QString tableName() override;
+    QString tableName() const override;
 
     const std::vector<QDir> &getAll() const;
 
