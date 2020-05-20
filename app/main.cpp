@@ -15,6 +15,7 @@
 int main(int argc, char *argv[])
 {
     qmlRegisterType<DirModel>("Models", 1, 0, "DirModel");
+    qmlRegisterType<PlaylistModel>("Models", 1, 0, "PlaylistModel");
 
     // Starting service
     qDebug() << "~~~ calling startService";

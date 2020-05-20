@@ -26,6 +26,10 @@ App {
         onMusicChanged: dataModel.musicChanged(index)
 
         onDirToggled: dataModel.toggleDir(index)
+
+        onPlaylistAdded: dataModel.playlistAdded(name)
+        onPlaylistEdited: dataModel.playlistEdited(index, name)
+        onPlaylistDeleted: dataModel.playlistDeleted(index)
     }
 
     Navigation {

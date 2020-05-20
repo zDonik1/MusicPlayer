@@ -10,18 +10,27 @@
 #include <messagetype.h>
 
 #include "dirdao.h"
+#include "playlistdao.h"
 
 DataModel::DataModel(DatabaseManager &databaseManager,
                      const QAndroidBinder &binder, QObject *parent)
     : QObject(parent)
     , m_databaseManager(databaseManager)
     , m_binder(binder)
+    , m_dirModel(new DirModel)
+    , m_playlistModel(new PlaylistModel)
 {
+    m_playlistModel->setPlaylists(m_databaseManager.getPlaylistDAO()->getAll());
 }
 
 DirModel *DataModel::getDirModel()
 {
-    return &m_dirModel;
+    return m_dirModel.get();
+}
+
+PlaylistModel *DataModel::getPlaylistModel()
+{
+    return m_playlistModel.get();
 }
 
 void DataModel::play()
@@ -96,10 +105,34 @@ void DataModel::refreshDirs()
         }
     }
 
-    m_dirModel.setupModel(dirFilesMap);
+    m_dirModel->setupModel(dirFilesMap);
 }
 
 void DataModel::toggleDir(int index)
 {
-    m_dirModel.toggleDir(index);
+    m_dirModel->toggleDir(index);
+}
+
+void DataModel::playlistAdded(QString name)
+{
+    qDebug() << "Adding playlist...";
+    int id = m_databaseManager.getPlaylistDAO()->createPlaylist(name);
+    m_playlistModel->addPlaylist({ id, name });
+    qDebug() << "Finished adding playlist";
+}
+
+void DataModel::playlistEdited(int index, QString name)
+{
+    qDebug() << "Editing playlist...";
+    int id = m_playlistModel->editPlaylist(m_playlistModel->index(index), name);
+    m_databaseManager.getPlaylistDAO()->updatePlaylist({ id, name });
+    qDebug() << "Fnished editing playlist";
+}
+
+void DataModel::playlistDeleted(int index)
+{
+    qDebug() << "Deleting playlist...";
+    int id = m_playlistModel->deletePlaylist(m_playlistModel->index(index));
+    m_databaseManager.getPlaylistDAO()->deletePlaylist(id);
+    qDebug() << "Fnished deleting playlist";
 }

@@ -16,14 +16,15 @@ public:
 
     const std::vector<Playlist> &getAll();
     const Playlist &getPlaylist(int id);
-    void createPlaylist(const Playlist &playlist);
+    int createPlaylist(const QString &name);
     void updatePlaylist(const Playlist &playlist);
     void deletePlaylist(int id);
 
 private:
-    void saveToCache(QSqlQuery &result);
+    void updateCache();
 
 private:
     std::vector<Playlist> m_playlists;
     bool m_dirty = true;
+    int m_idCounter = 0;
 };

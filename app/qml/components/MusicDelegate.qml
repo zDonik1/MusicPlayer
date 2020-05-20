@@ -96,6 +96,7 @@ Item {
     RippleMouseArea {
         anchors.fill: parent
         circularBackground: false
+
         onClicked: root.clicked()
     }
 }

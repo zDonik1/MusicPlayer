@@ -17,8 +17,8 @@ public:
 
     QSqlDatabase &getDatabase();
     const DirDAO *getDirDAO() const;
-    const PlaylistDAO *getPlaylistDAO() const;
-    const MusicDAO *getMusicDAO() const;
+    PlaylistDAO *getPlaylistDAO();
+    MusicDAO *getMusicDAO();
 
 private:
     QSqlDatabase m_database;

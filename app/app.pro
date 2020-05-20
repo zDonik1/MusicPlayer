@@ -48,7 +48,8 @@ SOURCES += main.cpp \
     dirdao.cpp \
     dirmodel.cpp \
     musicdao.cpp \
-    playlistdao.cpp
+    playlistdao.cpp \
+    playlistmodel.cpp
 
 HEADERS += \
     abstractdao.h \
@@ -61,7 +62,8 @@ HEADERS += \
     music.h \
     musicdao.h \
     playlist.h \
-    playlistdao.h
+    playlistdao.h \
+    playlistmodel.h
 
 android {
     ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
@@ -88,6 +90,8 @@ DISTFILES += \
     qml/components/MusicDelegate.qml \
     qml/pages/FilePage.qml \
     qml/pages/PlayerPage.qml \
-    qml/pages/PlaylistsPage.qml
+    qml/pages/PlaylistsPage.qml \
+    qml/components/PlaylistDelegate.qml \
+    qml/components/PlaylistDialog.qml
 
 INCLUDEPATH += ../common

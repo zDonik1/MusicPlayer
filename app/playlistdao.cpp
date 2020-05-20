@@ -1,8 +1,10 @@
-#include "playlistdao.h"
+﻿#include "playlistdao.h"
 
 #include <QSqlQuery>
 #include <QStringList>
 #include <QDebug>
+#include <QSqlError>
+#include <algorithm>
 
 PlaylistDAO::PlaylistDAO(QSqlDatabase &database)
     : AbstractDAO(database)
@@ -19,13 +21,18 @@ void PlaylistDAO::init()
         qDebug() << "Table is being created";
         QSqlQuery query(m_database);
         query.exec("create table " + tableName() + " ("
-                                                   "id integer primary key autoincrement,"
+                                                   "id integer primary key,"
                                                    "name text"
                                                    ")");
     }
+    updateCache();
 
-    QSqlQuery playlists = m_database.exec("select * from " + tableName());
-    saveToCache(playlists);
+    int maxId = -1;
+    for (const auto &playlist : m_playlists) {
+        if (maxId < playlist.id)
+            maxId = playlist.id;
+    }
+    m_idCounter = maxId + 1;
 }
 
 QString PlaylistDAO::tableName() const
@@ -35,11 +42,7 @@ QString PlaylistDAO::tableName() const
 
 const std::vector<Playlist> &PlaylistDAO::getAll()
 {
-    if (m_dirty) {
-        QSqlQuery playlists = m_database.exec("select * from " + tableName());
-        saveToCache(playlists);
-        m_dirty = false;
-    }
+    updateCache();
     return m_playlists;
 }
 
@@ -48,8 +51,7 @@ const Playlist &PlaylistDAO::getPlaylist(int id)
     if (id < 0)
         throw std::out_of_range("PlaylistDAO::getPlaylist: invalid id");
 
-    // reset cache if dirty
-    getAll();
+    updateCache();
 
     auto itr = std::find_if(m_playlists.cbegin(), m_playlists.cend(),
                          [&id] (const Playlist &playlist)
@@ -63,16 +65,17 @@ const Playlist &PlaylistDAO::getPlaylist(int id)
     return *itr;
 }
 
-void PlaylistDAO::createPlaylist(const Playlist &playlist)
+int PlaylistDAO::createPlaylist(const QString &name)
 {
-    if (playlist.id < 0 || playlist.name == "")
+    if (name == "")
         throw invalid_input();
 
     QSqlQuery query(m_database);
-    query.exec("insert into " + tableName() + " (id, name) values("
-               + playlist.id + ", " + playlist.name + ")");
-    m_playlists.emplace_back(playlist);
-    // not setting dirty to true since its easy to simply add it to cache
+    QString queryString = QStringLiteral("insert into %1 (id, name) values (%2, '%3')")
+            .arg(tableName()).arg(m_idCounter).arg(name);
+    query.exec(queryString);
+    m_playlists.push_back(Playlist{ m_idCounter, name });
+    return m_idCounter++;
 }
 
 void PlaylistDAO::updatePlaylist(const Playlist &playlist)
@@ -81,8 +84,9 @@ void PlaylistDAO::updatePlaylist(const Playlist &playlist)
         throw invalid_input();
 
     QSqlQuery query(m_database);
-    query.exec("update " + tableName() + " set name = " + playlist.name
-               + " where id = " + playlist.id);
+    QString queryString = QStringLiteral("update %1 set name = '%2' where id = %3")
+            .arg(tableName()).arg(playlist.name).arg(playlist.id);
+    query.exec(queryString);
     m_dirty = true;
 }
 
@@ -92,14 +96,22 @@ void PlaylistDAO::deletePlaylist(int id)
         throw std::out_of_range("PlaylistDAO::deletePlaylist: invalid id");
 
     QSqlQuery query(m_database);
-    query.exec("delete from " + tableName() + " where id = " + id);
+    QString queryString = QStringLiteral("delete from %1 where id = %2")
+            .arg(tableName()).arg(id);
+    query.exec(queryString);
     m_dirty = true;
 }
 
-void PlaylistDAO::saveToCache(QSqlQuery &result)
+void PlaylistDAO::updateCache()
 {
+    if (!m_dirty)
+        return;
+
+    QSqlQuery result = m_database.exec("select * from " + tableName());
+    m_playlists.clear();
     while (result.next()) {
         m_playlists.emplace_back(Playlist{ result.value(0).toInt(),
                                            result.value(1).toString() });
     }
+    m_dirty = false;
 }

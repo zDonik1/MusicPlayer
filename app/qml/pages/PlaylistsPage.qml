@@ -1,33 +1,56 @@
 import QtQuick 2.0
 import Felgo 3.0
 
+import "../components"
+
 Page {
+    property int editedPlaylistIndex
+
     title: qsTr("Playlists")
 
-    ListModel {
-        id: playlistModel
+    rightBarItem: IconButtonBarItem {
+        icon: IconType.plus
 
-        ListElement {
-            playlistTitle: "Favorite"
-            songCount: "12"
-        }
-        ListElement {
-            playlistTitle: "NEFFEX"
-            songCount: "15"
-        }
-        ListElement {
-            playlistTitle: "TheFatRat"
-            songCount: "23"
-        }
+        onClicked: dialogAdd.open()
     }
 
     AppListView {
         anchors.fill: parent
-        model: playlistModel
+        model: dataModel.playlistModel
 
-        delegate: SimpleRow {
-            text: playlistTitle
-            detailText: "Songs: " + songCount
+        delegate: PlaylistDelegate {
+            name: r_name
+            description: "Songs: " + r_songCount
+
+            onEditClicked: {
+                editedPlaylistIndex = index
+                dialogEdit.contentText = name
+                dialogEdit.open()
+            }
+
+            onDeleteClicked: logic.playlistDeleted(index)
+        }
+    }
+
+    PlaylistDialog {
+        id: dialogAdd
+        title: qsTr("New Playlist")
+
+        onAccepted: {
+            close()
+            logic.playlistAdded(contentText)
+            contentText = ""
+        }
+    }
+
+    PlaylistDialog {
+        id: dialogEdit
+        title: qsTr("Edit Playlist")
+
+        onAccepted: {
+            close()
+            logic.playlistEdited(editedPlaylistIndex, contentText)
+            contentText = ""
         }
     }
 }

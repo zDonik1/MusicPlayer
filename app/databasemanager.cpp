@@ -56,12 +56,12 @@ const DirDAO *DatabaseManager::getDirDAO() const
     return dynamic_cast<DirDAO *>(m_daos.at("dir").get());
 }
 
-const PlaylistDAO *DatabaseManager::getPlaylistDAO() const
+PlaylistDAO *DatabaseManager::getPlaylistDAO()
 {
     return dynamic_cast<PlaylistDAO *>(m_daos.at("playlist").get());
 }
 
-const MusicDAO *DatabaseManager::getMusicDAO() const
+MusicDAO *DatabaseManager::getMusicDAO()
 {
     return dynamic_cast<MusicDAO *>(m_daos.at("music").get());
 }

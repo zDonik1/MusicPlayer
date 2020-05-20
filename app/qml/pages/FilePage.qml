@@ -6,6 +6,12 @@ import "../components"
 Page {
     title: qsTr("Files")
 
+    rightBarItem: IconButtonBarItem {
+        icon: IconType.plus
+
+        onClicked: dialogAdd.open()
+    }
+
     AppListView {
         id: listFile
         scrollIndicatorVisible: true
