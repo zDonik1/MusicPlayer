@@ -11,6 +11,9 @@ Item {
     property alias iconItem: icon
     property alias textItem: textName
     property bool open: true
+    property alias optionsButtonIcon: optionsButtonIcon.icon
+    property alias optionButtonColor: optionsButtonIcon.color
+    property alias hasOptionsButton: menuButtonContainer.visible
 
     id: root
     width: parent.width
@@ -66,10 +69,12 @@ Item {
             bottom: parent.bottom
         }
         width: height
+        enabled: visible
 
         Icon {
+            id: optionsButtonIcon
             anchors.centerIn: parent
-            icon: IconType.ellipsisv
+            icon: IconType.cc
             color: Theme.tintColor
         }
 

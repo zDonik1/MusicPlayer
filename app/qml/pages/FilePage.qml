@@ -4,12 +4,21 @@ import Felgo 3.0
 import "../components"
 
 Page {
+    id: rootPage
     title: qsTr("Files")
 
-    rightBarItem: IconButtonBarItem {
-        icon: IconType.plus
+    rightBarItem: NavigationBarRow {
+        IconButtonBarItem {
+            icon: IconType.minus
 
-        onClicked: dialogAdd.open()
+            onClicked: navigationStack.push(rootDirsPage)
+        }
+
+        IconButtonBarItem {
+            icon: IconType.plus
+
+            onClicked: navigationStack.push(filesystemPage)
+        }
     }
 
     AppListView {
@@ -27,9 +36,24 @@ Page {
             backgroundColor: r_isDir ? Qt.lighter(Qt.lighter(Theme.tintColor))
                                      : Theme.backgroundColor
             open: r_isOpen
+            optionsButtonIcon: IconType.ellipsisv
 
             onClicked: if (r_isDir)
                            logic.dirToggled(index)
+        }
+    }
+
+    Component {
+        id: rootDirsPage
+
+        RootDirsPage {
+        }
+    }
+
+    Component {
+        id: filesystemPage
+
+        FilesystemPage {
         }
     }
 }

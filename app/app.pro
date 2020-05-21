@@ -45,11 +45,12 @@ SOURCES += main.cpp \
     appconnection.cpp \
     databasemanager.cpp \
     datamodel.cpp \
-    dirdao.cpp \
     dirmodel.cpp \
     musicdao.cpp \
     playlistdao.cpp \
-    playlistmodel.cpp
+    playlistmodel.cpp \
+    rootdirdao.cpp \
+    rootdirmodel.cpp
 
 HEADERS += \
     abstractdao.h \
@@ -57,13 +58,15 @@ HEADERS += \
     appconnection.h \
     databasemanager.h \
     datamodel.h \
-    dirdao.h \
+    directory.h \
     dirmodel.h \
     music.h \
     musicdao.h \
     playlist.h \
     playlistdao.h \
-    playlistmodel.h
+    playlistmodel.h \
+    rootdirdao.h \
+    rootdirmodel.h
 
 android {
     ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
@@ -87,11 +90,13 @@ DISTFILES += \
     android/src/com/zdonik/musicplayer/PlayerService.java \
     qml/Logic.qml \
     qml/components/FileBaseDelegate.qml \
+    qml/components/FilesystemPage.qml \
     qml/components/MusicDelegate.qml \
     qml/pages/FilePage.qml \
     qml/pages/PlayerPage.qml \
     qml/pages/PlaylistsPage.qml \
     qml/components/PlaylistDelegate.qml \
-    qml/components/PlaylistDialog.qml
+    qml/pages/PlaylistDialog.qml \
+    qml/pages/RootDirsPage.qml
 
 INCLUDEPATH += ../common

@@ -10,6 +10,8 @@ Item {
     signal musicChanged(int index)
 
     signal dirToggled(int index)
+    signal musicRootDirAdded(url path)
+    signal musicRootDirDeleted(int index)
 
     signal playlistAdded(string name)
     signal playlistEdited(int index, string name)

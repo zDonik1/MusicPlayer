@@ -9,20 +9,20 @@ DirModel::DirModel()
 
 void DirModel::setupModel(const std::map<QString, QStringList> &map)
 {
-    m_entryInfo.clear();
+    m_dirEntryInfo.clear();
     beginResetModel();
     for (const auto &pair : map) {
         QVariantHash dirHash;
         dirHash["filename"] = pair.first;
         dirHash["isDir"] = true;
         dirHash["isOpen"] = true;
-        m_entryInfo.emplace_back(dirHash);
+        m_dirEntryInfo.emplace_back(dirHash);
         for (const auto &filename : pair.second) {
             QVariantHash fileHash;
             fileHash["filename"] = filename;
             fileHash["isDir"] = false;
             fileHash["isOpen"] = true;
-            m_entryInfo.emplace_back(fileHash);
+            m_dirEntryInfo.emplace_back(fileHash);
         }
     }
     endResetModel();
@@ -31,16 +31,16 @@ void DirModel::setupModel(const std::map<QString, QStringList> &map)
 void DirModel::toggleDir(int index)
 {
     qDebug() << "~~~ toggling dir at index" << index;
-    m_entryInfo.at(index)["isOpen"] = !m_entryInfo.at(index)["isOpen"].toBool();
+    m_dirEntryInfo.at(index)["isOpen"] = !m_dirEntryInfo.at(index)["isOpen"].toBool();
     int i;
     for (i = index + 1; ; ++i) {
-        if (m_entryInfo.at(i)["isDir"].toBool()
-                || i >= static_cast<int>(m_entryInfo.size()))
+        if (m_dirEntryInfo.at(i)["isDir"].toBool()
+                || i >= static_cast<int>(m_dirEntryInfo.size()))
         {
             break;
         }
 
-        auto &isOpen = m_entryInfo.at(i)["isOpen"];
+        auto &isOpen = m_dirEntryInfo.at(i)["isOpen"];
         isOpen = !isOpen.toBool();
     }
     dataChanged(createIndex(index, 0), createIndex(i, 0), { Roles::IsOpen });
@@ -48,7 +48,7 @@ void DirModel::toggleDir(int index)
 
 int DirModel::rowCount(const QModelIndex &/*parent*/) const
 {
-    return m_entryInfo.size();
+    return m_dirEntryInfo.size();
 }
 
 QVariant DirModel::data(const QModelIndex &index, int role) const
@@ -58,15 +58,15 @@ QVariant DirModel::data(const QModelIndex &index, int role) const
 
     switch (role) {
     case Roles::IsDirRole:
-        return m_entryInfo.at(index.row())["isDir"];
+        return m_dirEntryInfo.at(index.row())["isDir"];
 
     case Roles::IsOpen:
-        return m_entryInfo.at(index.row())["isOpen"];
+        return m_dirEntryInfo.at(index.row())["isOpen"];
 
     case Roles::NameRole:
     case Qt::DisplayRole: {
-        QString filename = m_entryInfo.at(index.row())["filename"].toString();
-        if (m_entryInfo.at(index.row())["isDir"].toBool())
+        QString filename = m_dirEntryInfo.at(index.row())["filename"].toString();
+        if (m_dirEntryInfo.at(index.row())["isDir"].toBool())
             return QDir(filename).dirName();
         else
             return filename;

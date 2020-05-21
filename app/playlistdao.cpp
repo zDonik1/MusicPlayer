@@ -74,7 +74,7 @@ int PlaylistDAO::createPlaylist(const QString &name)
     QString queryString = QStringLiteral("insert into %1 (id, name) values (%2, '%3')")
             .arg(tableName()).arg(m_idCounter).arg(name);
     query.exec(queryString);
-    m_playlists.push_back(Playlist{ m_idCounter, name });
+    m_playlists.emplace_back(Playlist{ m_idCounter, name });
     return m_idCounter++;
 }
 

@@ -26,5 +26,5 @@ public:
 
 private:
     // hash contains filename [QString], isDir [bool], isOpen[bool]
-    std::vector<QVariantHash> m_entryInfo;
+    std::vector<QVariantHash> m_dirEntryInfo;
 };

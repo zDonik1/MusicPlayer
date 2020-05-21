@@ -16,10 +16,6 @@ void PlaylistModel::setPlaylists(const std::vector<Playlist> &playlists)
     beginResetModel();
     m_playlists = std::move(playlists);
     endResetModel();
-    qDebug() << "playlist:";
-    for (const auto &playlist : m_playlists) {
-        qDebug() << playlist.name;
-    }
 }
 
 void PlaylistModel::addPlaylist(const Playlist &playlist)
@@ -56,8 +52,6 @@ QVariant PlaylistModel::data(const QModelIndex &index, int role) const
     if (!index.isValid())
         return QVariant();
 
-    qDebug() << "size:" << m_playlists.size();
-    qDebug() << "index:" << index.row() << m_playlists.at(index.row()).name;
     switch (role) {
     case Qt::DisplayRole:
     case Roles::NameRole:

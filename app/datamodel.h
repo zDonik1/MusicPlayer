@@ -7,6 +7,7 @@
 
 #include "databasemanager.h"
 #include "dirmodel.h"
+#include "rootdirmodel.h"
 #include "playlistmodel.h"
 
 class DataModel : public QObject
@@ -14,6 +15,8 @@ class DataModel : public QObject
     Q_OBJECT
 
     Q_PROPERTY(DirModel *dirModel READ getDirModel NOTIFY dirModelChanged)
+    Q_PROPERTY(RootDirModel *rootDirModel READ getRootDirModel
+               NOTIFY rootDirModelChanged)
     Q_PROPERTY(PlaylistModel *playlistModel READ getPlaylistModel
                NOTIFY playlistModelChanged)
 
@@ -22,6 +25,7 @@ public:
                        const QAndroidBinder &binder, QObject *parent = nullptr);
 
     DirModel *getDirModel();
+    RootDirModel *getRootDirModel();
     PlaylistModel *getPlaylistModel();
 
 public slots:
@@ -35,6 +39,8 @@ public slots:
 
     void refreshDirs();
     void toggleDir(int index);
+    void musicRootDirAdded(const QUrl &path);
+    void musicRootDirDeleted(int index);
 
     void playlistAdded(QString name);
     void playlistEdited(int index, QString name);
@@ -42,6 +48,7 @@ public slots:
 
 signals:
     void dirModelChanged();
+    void rootDirModelChanged();
     void playlistModelChanged();
 
 private:
@@ -49,5 +56,6 @@ private:
     const QAndroidBinder &m_binder;
 
     std::unique_ptr<DirModel> m_dirModel;
+    std::unique_ptr<RootDirModel> m_rootDirModel;
     std::unique_ptr<PlaylistModel> m_playlistModel;
 };

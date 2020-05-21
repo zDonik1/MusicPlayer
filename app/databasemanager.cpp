@@ -4,7 +4,7 @@
 #include <QStandardPaths>
 #include <QDir>
 
-#include "dirdao.h"
+#include "rootdirdao.h"
 #include "playlistdao.h"
 #include "musicdao.h"
 
@@ -37,7 +37,7 @@ DatabaseManager::DatabaseManager()
     }
 
     // setting up daos
-    m_daos["dir"] = make_unique<DirDAO>(m_database);
+    m_daos["dir"] = make_unique<RootDirDAO>(m_database);
     m_daos["playlist"] = make_unique<PlaylistDAO>(m_database);
     m_daos["music"] = make_unique<MusicDAO>(m_database);
 
@@ -51,9 +51,9 @@ QSqlDatabase &DatabaseManager::getDatabase()
     return m_database;
 }
 
-const DirDAO *DatabaseManager::getDirDAO() const
+RootDirDAO *DatabaseManager::getRootDirDAO()
 {
-    return dynamic_cast<DirDAO *>(m_daos.at("dir").get());
+    return dynamic_cast<RootDirDAO *>(m_daos.at("dir").get());
 }
 
 PlaylistDAO *DatabaseManager::getPlaylistDAO()

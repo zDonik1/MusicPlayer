@@ -26,6 +26,8 @@ App {
         onMusicChanged: dataModel.musicChanged(index)
 
         onDirToggled: dataModel.toggleDir(index)
+        onMusicRootDirAdded: dataModel.musicRootDirAdded(path)
+        onMusicRootDirDeleted: dataModel.musicRootDirDeleted(index)
 
         onPlaylistAdded: dataModel.playlistAdded(name)
         onPlaylistEdited: dataModel.playlistEdited(index, name)
@@ -61,6 +63,8 @@ App {
             onSelected: dataModel.refreshDirs()
 
             NavigationStack {
+                transitionDelegate: transitionDelegateiOS
+
                 FilePage {
                 }
             }

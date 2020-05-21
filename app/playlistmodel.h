@@ -10,7 +10,8 @@ class PlaylistModel : public QAbstractListModel
     Q_OBJECT
 
 public:
-    enum Roles {
+    enum Roles
+    {
         NameRole = Qt::UserRole,
     };
 

@@ -5,11 +5,12 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QStack>
+#include <QUrl>
 #include <QDebug>
 
 #include <messagetype.h>
 
-#include "dirdao.h"
+#include "rootdirdao.h"
 #include "playlistdao.h"
 
 DataModel::DataModel(DatabaseManager &databaseManager,
@@ -18,14 +19,21 @@ DataModel::DataModel(DatabaseManager &databaseManager,
     , m_databaseManager(databaseManager)
     , m_binder(binder)
     , m_dirModel(new DirModel)
+    , m_rootDirModel(new RootDirModel)
     , m_playlistModel(new PlaylistModel)
 {
     m_playlistModel->setPlaylists(m_databaseManager.getPlaylistDAO()->getAll());
+    m_rootDirModel->setRootDirs(m_databaseManager.getRootDirDAO()->getAll());
 }
 
 DirModel *DataModel::getDirModel()
 {
     return m_dirModel.get();
+}
+
+RootDirModel *DataModel::getRootDirModel()
+{
+    return m_rootDirModel.get();
 }
 
 PlaylistModel *DataModel::getPlaylistModel()
@@ -79,13 +87,8 @@ void DataModel::musicChanged(int index)
 
 void DataModel::refreshDirs()
 {
-    qDebug() << "Refresh dirs called";
     QStack<QDir> stack;
-    auto rootDirs = m_databaseManager.getDirDAO()->getAll();
-    for (auto dir : rootDirs) {
-        qDebug() << "dir:" << dir;
-        stack.push_back(dir);
-    }
+    auto rootDirs = m_databaseManager.getRootDirDAO()->getAll();
 
     // Recurssively traversing root dirs
     std::map<QString, QStringList> dirFilesMap;
@@ -113,26 +116,35 @@ void DataModel::toggleDir(int index)
     m_dirModel->toggleDir(index);
 }
 
+void DataModel::musicRootDirAdded(const QUrl &path)
+{
+    int id = m_databaseManager.getRootDirDAO()->createDir(path.path());
+    m_rootDirModel->addRootDir({ id, path.path() });
+    refreshDirs();
+}
+
+void DataModel::musicRootDirDeleted(int index)
+{
+    int id = m_rootDirModel->deleteRootDir(m_rootDirModel->index(index));
+    m_databaseManager.getRootDirDAO()->deleteDir(id);
+    refreshDirs();
+}
+
 void DataModel::playlistAdded(QString name)
 {
-    qDebug() << "Adding playlist...";
     int id = m_databaseManager.getPlaylistDAO()->createPlaylist(name);
     m_playlistModel->addPlaylist({ id, name });
-    qDebug() << "Finished adding playlist";
 }
 
 void DataModel::playlistEdited(int index, QString name)
 {
-    qDebug() << "Editing playlist...";
     int id = m_playlistModel->editPlaylist(m_playlistModel->index(index), name);
     m_databaseManager.getPlaylistDAO()->updatePlaylist({ id, name });
-    qDebug() << "Fnished editing playlist";
 }
 
 void DataModel::playlistDeleted(int index)
 {
-    qDebug() << "Deleting playlist...";
     int id = m_playlistModel->deletePlaylist(m_playlistModel->index(index));
     m_databaseManager.getPlaylistDAO()->deletePlaylist(id);
-    qDebug() << "Fnished deleting playlist";
 }
+
