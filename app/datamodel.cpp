@@ -89,6 +89,8 @@ void DataModel::refreshDirs()
 {
     QStack<QDir> stack;
     auto rootDirs = m_databaseManager.getRootDirDAO()->getAll();
+    for (const auto &dir : rootDirs)
+        stack.push_back(dir.dir);
 
     // Recurssively traversing root dirs
     std::map<QString, QStringList> dirFilesMap;
@@ -103,6 +105,7 @@ void DataModel::refreshDirs()
 
         QStringList dirNames = dir.entryList(QDir::Dirs
                                              | QDir::NoDotAndDotDot);
+
         for (auto dirName : dirNames) {
             stack.push_back(QDir(dir.absolutePath() + "/" + dirName));
         }

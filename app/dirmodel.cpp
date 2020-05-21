@@ -30,12 +30,11 @@ void DirModel::setupModel(const std::map<QString, QStringList> &map)
 
 void DirModel::toggleDir(int index)
 {
-    qDebug() << "~~~ toggling dir at index" << index;
     m_dirEntryInfo.at(index)["isOpen"] = !m_dirEntryInfo.at(index)["isOpen"].toBool();
     int i;
     for (i = index + 1; ; ++i) {
-        if (m_dirEntryInfo.at(i)["isDir"].toBool()
-                || i >= static_cast<int>(m_dirEntryInfo.size()))
+        if (i >= static_cast<int>(m_dirEntryInfo.size())
+                || m_dirEntryInfo.at(i)["isDir"].toBool())
         {
             break;
         }
