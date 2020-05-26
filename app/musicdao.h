@@ -7,23 +7,26 @@
 
 class MusicDAO : public AbstractDAO
 {
+    Q_OBJECT
+
 public:
     MusicDAO(QSqlDatabase &database);
     ~MusicDAO() override;
 
     void init() override;
-    QString tableName() const override;
+    static QString tableName();
 
     const std::vector<Music> &getAll();
-    const Music &getMusic(int id);
-    void createMusic(const Music &music);
+    int findByPath(const QUrl &path) const;
+    int createMusic(const QUrl &path);
     void updateMusic(const Music &music);
     void deleteMusic(int id);
 
 private:
-    void saveToCache(QSqlQuery &result);
+    void updateCache();
 
 private:
-    bool m_dirty = true;
     std::vector<Music> m_music;
+    bool m_dirty = true;
+    int m_idCounter = 0;
 };

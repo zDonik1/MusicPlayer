@@ -1,4 +1,5 @@
 import QtQuick 2.0
+import QtQuick.Controls 2.12
 import Felgo 3.0
 
 import "../components"
@@ -40,6 +41,71 @@ Page {
 
             onClicked: if (r_isDir)
                            logic.dirToggled(index)
+                       else
+                           optionsClicked()
+
+            onOptionsClicked: if (r_isDir)
+                                  menuDir.open()
+                              else
+                                  menuFile.open()
+
+            DropdownMenu {
+                id: menuDir
+                width: dp(200)
+                x: rootPage.width
+
+                Action {
+                    text: qsTr("Add to playlist")
+
+                    onTriggered: {
+                        menuDir.close()
+                        playlistPopupAdd.fileIndex = index
+                        playlistPopupAdd.isAddingDir = true
+                        playlistPopupAdd.open()
+                    }
+                }
+            }
+
+            DropdownMenu {
+                id: menuFile
+                width: dp(200)
+                x: rootPage.width
+
+                Action {
+                    text: qsTr("Add to playlist")
+
+                    onTriggered: {
+                        menuDir.close()
+                        playlistPopupAdd.fileIndex = index
+                        playlistPopupAdd.isAddingDir = false
+                        playlistPopupAdd.open()
+                    }
+                }
+
+                Action {
+                    text: qsTr("Delete from memory")
+
+                    onTriggered: {
+                        menuFile.close()
+                        logic.deleteMusicFromMemory(index)
+                    }
+                }
+            }
+        }
+    }
+
+    PlaylistPopup {
+        property int fileIndex: -1
+        property bool isAddingDir: false
+
+        id: playlistPopupAdd
+
+        onPlaylistClicked: {
+            if (isAddingDir)
+                logic.addDirToPlaylist(fileIndex, index)
+            else
+                logic.addMusicToPlaylist(fileIndex, index)
+            close()
         }
     }
 

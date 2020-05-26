@@ -9,11 +9,15 @@ Item {
     signal repeat()
     signal musicChanged(int index)
 
-    signal dirToggled(int index)
-    signal musicRootDirAdded(url path)
-    signal musicRootDirDeleted(int index)
-
     signal playlistAdded(string name)
     signal playlistEdited(int index, string name)
     signal playlistDeleted(int index)
+
+    signal dirToggled(int index)
+    signal addDirToPlaylist(int dirIndex, int playlistIndex)
+    signal addMusicToPlaylist(int musicIndex, int playlistIndex)
+    signal deleteMusicFromMemory(int index)
+
+    signal musicRootDirAdded(url path)
+    signal musicRootDirDeleted(int index)
 }

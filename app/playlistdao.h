@@ -12,7 +12,7 @@ public:
     ~PlaylistDAO() override;
 
     void init() override;
-    QString tableName() const override;
+    static QString tableName();
 
     const std::vector<Playlist> &getAll();
     const Playlist &getPlaylist(int id);

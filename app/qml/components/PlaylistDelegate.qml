@@ -9,6 +9,7 @@ Item {
 
     property alias name: textName.text
     property alias description: textDescription.text
+    property alias hasOptionsButton: buttonContainer.visible
 
     id: root
     height: dp(60)

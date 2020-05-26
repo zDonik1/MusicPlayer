@@ -6,12 +6,16 @@
 #include <QJsonDocument>
 #include <QStack>
 #include <QUrl>
+#include <QThread>
 #include <QDebug>
 
 #include <messagetype.h>
 
 #include "rootdirdao.h"
 #include "playlistdao.h"
+#include "musicdao.h"
+#include "playlistmusicdao.h"
+#include "musicaddworker.h"
 
 DataModel::DataModel(DatabaseManager &databaseManager,
                      const QAndroidBinder &binder, QObject *parent)
@@ -22,7 +26,21 @@ DataModel::DataModel(DatabaseManager &databaseManager,
     , m_rootDirModel(new RootDirModel)
     , m_playlistModel(new PlaylistModel)
 {
-    m_playlistModel->setPlaylists(m_databaseManager.getPlaylistDAO()->getAll());
+    connect(m_databaseManager.getPlaylistMusicDAO(),
+            &PlaylistMusicDAO::musicAddedToPlaylist,
+            m_playlistModel.get(), &PlaylistModel::incrementMusicCount);
+    connect(m_databaseManager.getPlaylistMusicDAO(),
+            &PlaylistMusicDAO::musicRemovedFromPlaylist,
+            m_playlistModel.get(), &PlaylistModel::decrementMusicCount);
+
+    // setting up playlists
+    auto playlists = m_databaseManager.getPlaylistDAO()->getAll();
+    for (auto &playlist : playlists) {
+        playlist.musicCount = m_databaseManager.getPlaylistMusicDAO()
+                ->getMusicCount(playlist.id);
+    }
+    m_playlistModel->setPlaylists(playlists);
+
     m_rootDirModel->setRootDirs(m_databaseManager.getRootDirDAO()->getAll());
 }
 
@@ -85,6 +103,24 @@ void DataModel::musicChanged(int index)
     m_binder.transact(MessageType::SEEK, sendData, &replyData);
 }
 
+void DataModel::playlistAdded(QString name)
+{
+    int id = m_databaseManager.getPlaylistDAO()->createPlaylist(name);
+    m_playlistModel->addPlaylist({ id, name });
+}
+
+void DataModel::playlistEdited(int index, QString name)
+{
+    int id = m_playlistModel->editPlaylist(m_playlistModel->index(index), name);
+    m_databaseManager.getPlaylistDAO()->updatePlaylist({ id, name });
+}
+
+void DataModel::playlistDeleted(int index)
+{
+    int id = m_playlistModel->deletePlaylist(m_playlistModel->index(index));
+    m_databaseManager.getPlaylistDAO()->deletePlaylist(id);
+}
+
 void DataModel::refreshDirs()
 {
     QStack<QDir> stack;
@@ -116,7 +152,42 @@ void DataModel::refreshDirs()
 
 void DataModel::toggleDir(int index)
 {
-    m_dirModel->toggleDir(index);
+    m_dirModel->toggleDir(m_dirModel->index(index));
+}
+
+void DataModel::addDirToPlaylist(int dirIndex, int playlistIndex)
+{
+    // big dirs freeze UI so adding music to DB in worker thread
+    QThread *thread = new QThread;
+    MusicAddWorker *worker = new MusicAddWorker(
+                *m_dirModel, *m_playlistModel,
+                *m_databaseManager.getMusicDAO(),
+                *m_databaseManager.getPlaylistMusicDAO(),
+                dirIndex, playlistIndex);
+    worker->moveToThread(thread);
+    connect(thread, &QThread::started, worker, &MusicAddWorker::process);
+    connect(worker, &MusicAddWorker::finished, thread, &QThread::quit);
+    connect(worker, &MusicAddWorker::finished, worker, &QThread::deleteLater);
+    connect(thread, &QThread::finished, thread, &QThread::deleteLater);
+    thread->start();
+}
+
+void DataModel::addMusicToPlaylist(int musicIndex, int playlistIndex)
+{
+    auto file = m_dirModel->getFile(m_dirModel->index(musicIndex));
+    int playlistId = m_playlistModel->getPlaylist(m_playlistModel
+                                                  ->index(playlistIndex)).id;
+    int musicId = m_databaseManager.getMusicDAO()->createMusic(file);
+    m_databaseManager.getPlaylistMusicDAO()
+            ->addMusicToPlaylist(musicId, playlistId);
+}
+
+void DataModel::deleteMusicFromMemory(int index)
+{
+    auto file = m_dirModel->getFile(m_dirModel->index(index));
+    QFile::remove(file);
+    int id = m_databaseManager.getMusicDAO()->findByPath(file);
+    m_databaseManager.getMusicDAO()->deleteMusic(id);
 }
 
 void DataModel::musicRootDirAdded(const QUrl &path)
@@ -132,22 +203,3 @@ void DataModel::musicRootDirDeleted(int index)
     m_databaseManager.getRootDirDAO()->deleteDir(id);
     refreshDirs();
 }
-
-void DataModel::playlistAdded(QString name)
-{
-    int id = m_databaseManager.getPlaylistDAO()->createPlaylist(name);
-    m_playlistModel->addPlaylist({ id, name });
-}
-
-void DataModel::playlistEdited(int index, QString name)
-{
-    int id = m_playlistModel->editPlaylist(m_playlistModel->index(index), name);
-    m_databaseManager.getPlaylistDAO()->updatePlaylist({ id, name });
-}
-
-void DataModel::playlistDeleted(int index)
-{
-    int id = m_playlistModel->deletePlaylist(m_playlistModel->index(index));
-    m_databaseManager.getPlaylistDAO()->deletePlaylist(id);
-}
-

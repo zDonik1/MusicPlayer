@@ -46,9 +46,11 @@ SOURCES += main.cpp \
     databasemanager.cpp \
     datamodel.cpp \
     dirmodel.cpp \
+    musicaddworker.cpp \
     musicdao.cpp \
     playlistdao.cpp \
     playlistmodel.cpp \
+    playlistmusicdao.cpp \
     rootdirdao.cpp \
     rootdirmodel.cpp
 
@@ -61,10 +63,12 @@ HEADERS += \
     directory.h \
     dirmodel.h \
     music.h \
+    musicaddworker.h \
     musicdao.h \
     playlist.h \
     playlistdao.h \
     playlistmodel.h \
+    playlistmusicdao.h \
     rootdirdao.h \
     rootdirmodel.h
 
@@ -92,6 +96,7 @@ DISTFILES += \
     qml/components/FileBaseDelegate.qml \
     qml/components/FilesystemPage.qml \
     qml/components/MusicDelegate.qml \
+    qml/components/PlaylistPopup.qml \
     qml/pages/FilePage.qml \
     qml/pages/PlayerPage.qml \
     qml/pages/PlaylistsPage.qml \

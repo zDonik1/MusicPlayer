@@ -11,7 +11,10 @@ Page {
     rightBarItem: IconButtonBarItem {
         icon: IconType.plus
 
-        onClicked: dialogAdd.open()
+        onClicked: {
+            dialogAdd.y = -22;
+            dialogAdd.open()
+        }
     }
 
     AppListView {
@@ -20,11 +23,12 @@ Page {
 
         delegate: PlaylistDelegate {
             name: r_name
-            description: "Songs: " + r_songCount
+            description: "Songs: " + r_musicCount
 
             onEditClicked: {
                 editedPlaylistIndex = index
                 dialogEdit.contentText = name
+                dialogEdit.y = -22;
                 dialogEdit.open()
             }
 

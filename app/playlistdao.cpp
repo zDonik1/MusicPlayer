@@ -3,7 +3,6 @@
 #include <QSqlQuery>
 #include <QStringList>
 #include <QDebug>
-#include <QSqlError>
 #include <algorithm>
 
 PlaylistDAO::PlaylistDAO(QSqlDatabase &database)
@@ -35,7 +34,7 @@ void PlaylistDAO::init()
     m_idCounter = maxId + 1;
 }
 
-QString PlaylistDAO::tableName() const
+QString PlaylistDAO::tableName()
 {
     return "playlist";
 }
@@ -71,8 +70,11 @@ int PlaylistDAO::createPlaylist(const QString &name)
         throw invalid_input();
 
     QSqlQuery query(m_database);
-    QString queryString = QStringLiteral("insert into %1 (id, name) values (%2, '%3')")
-            .arg(tableName()).arg(m_idCounter).arg(name);
+    QString queryString = QStringLiteral
+            ("insert into %1 (id, name) values (%2, '%3')")
+            .arg(tableName())
+            .arg(m_idCounter)
+            .arg(name);
     query.exec(queryString);
     m_playlists.emplace_back(Playlist{ m_idCounter, name });
     return m_idCounter++;
@@ -85,7 +87,9 @@ void PlaylistDAO::updatePlaylist(const Playlist &playlist)
 
     QSqlQuery query(m_database);
     QString queryString = QStringLiteral("update %1 set name = '%2' where id = %3")
-            .arg(tableName()).arg(playlist.name).arg(playlist.id);
+            .arg(tableName())
+            .arg(playlist.name)
+            .arg(playlist.id);
     query.exec(queryString);
     m_dirty = true;
 }
@@ -97,7 +101,8 @@ void PlaylistDAO::deletePlaylist(int id)
 
     QSqlQuery query(m_database);
     QString queryString = QStringLiteral("delete from %1 where id = %2")
-            .arg(tableName()).arg(id);
+            .arg(tableName())
+            .arg(id);
     query.exec(queryString);
     m_dirty = true;
 }
@@ -107,7 +112,7 @@ void PlaylistDAO::updateCache()
     if (!m_dirty)
         return;
 
-    QSqlQuery result = m_database.exec("select * from " + tableName());
+    QSqlQuery result = m_database.exec("select id, name from " + tableName());
     m_playlists.clear();
     while (result.next()) {
         m_playlists.emplace_back(Playlist{ result.value(0).toInt(),

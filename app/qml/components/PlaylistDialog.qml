@@ -19,8 +19,6 @@ Dialog {
         onActiveFocusChanged: {
             if (activeFocus)
                 root.y = root.y - dp(150)
-            else
-                root.y = root.y + dp(150)
         }
     }
 

@@ -26,12 +26,16 @@ App {
         onMusicChanged: dataModel.musicChanged(index)
 
         onDirToggled: dataModel.toggleDir(index)
-        onMusicRootDirAdded: dataModel.musicRootDirAdded(path)
-        onMusicRootDirDeleted: dataModel.musicRootDirDeleted(index)
+        onAddDirToPlaylist: dataModel.addDirToPlaylist(dirIndex, playlistIndex)
+        onAddMusicToPlaylist: dataModel.addMusicToPlaylist(musicIndex, playlistIndex)
+        onDeleteMusicFromMemory: dataModel.addMusicToPlaylist(index)
 
         onPlaylistAdded: dataModel.playlistAdded(name)
         onPlaylistEdited: dataModel.playlistEdited(index, name)
         onPlaylistDeleted: dataModel.playlistDeleted(index)
+
+        onMusicRootDirAdded: dataModel.musicRootDirAdded(path)
+        onMusicRootDirDeleted: dataModel.musicRootDirDeleted(index)
     }
 
     Navigation {

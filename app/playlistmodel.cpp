@@ -53,6 +53,10 @@ QVariant PlaylistModel::data(const QModelIndex &index, int role) const
         return QVariant();
 
     switch (role) {
+    case Roles::MusicCountRole:
+        return m_playlists.at(index.row()).musicCount;
+        break;
+
     case Qt::DisplayRole:
     case Roles::NameRole:
         return m_playlists.at(index.row()).name;
@@ -66,5 +70,37 @@ QHash<int, QByteArray> PlaylistModel::roleNames() const
 {
     QHash<int, QByteArray> roles;
     roles[Roles::NameRole] = "r_name";
+    roles[Roles::MusicCountRole] = "r_musicCount";
     return roles;
+}
+
+void PlaylistModel::incrementMusicCount(int playlistId)
+{
+    auto index = findById(playlistId);
+    if (!index.isValid())
+        return;
+
+    ++m_playlists.at(index.row()).musicCount;
+    dataChanged(index, index, { Roles::MusicCountRole });
+}
+
+void PlaylistModel::decrementMusicCount(int playlistId)
+{
+    auto index = findById(playlistId);
+    if (!index.isValid())
+        return;
+
+    --m_playlists.at(index.row()).musicCount;
+    dataChanged(index, index, { Roles::MusicCountRole });
+}
+
+QModelIndex PlaylistModel::findById(int id)
+{
+    for (int i = 0; i < static_cast<int>(m_playlists.size()); ++i) {
+        if (m_playlists.at(i).id == id) {
+            return createIndex(i, 0);
+        }
+    }
+
+    return QModelIndex();
 }

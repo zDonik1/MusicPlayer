@@ -37,14 +37,18 @@ public slots:
     void repeat();
     void musicChanged(int index);
 
-    void refreshDirs();
-    void toggleDir(int index);
-    void musicRootDirAdded(const QUrl &path);
-    void musicRootDirDeleted(int index);
-
     void playlistAdded(QString name);
     void playlistEdited(int index, QString name);
     void playlistDeleted(int index);
+
+    void refreshDirs();
+    void toggleDir(int index);
+    void addDirToPlaylist(int dirIndex, int playlistIndex);
+    void addMusicToPlaylist(int musicIndex, int playlistIndex);
+    void deleteMusicFromMemory(int index);
+
+    void musicRootDirAdded(const QUrl &path);
+    void musicRootDirDeleted(int index);
 
 signals:
     void dirModelChanged();

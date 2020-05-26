@@ -13,6 +13,7 @@ public:
     enum Roles
     {
         NameRole = Qt::UserRole,
+        MusicCountRole,
     };
 
 public:
@@ -29,6 +30,13 @@ public:
     QVariant data(const QModelIndex &index,
                   int role = Qt::DisplayRole) const override;
     QHash<int, QByteArray> roleNames() const override;
+
+public slots:
+    void incrementMusicCount(int playlistId);
+    void decrementMusicCount(int playlistId);
+
+private:
+    QModelIndex findById(int id);
 
 private:
     std::vector<Playlist> m_playlists;

@@ -1,6 +1,7 @@
 #include "musicdao.h"
 
 #include <QSqlQuery>
+#include <QSqlError>
 #include <QStringList>
 #include <QDebug>
 
@@ -16,76 +17,79 @@ MusicDAO::~MusicDAO()
 void MusicDAO::init()
 {
     if (!m_database.tables().contains(tableName())) {
-        qDebug() << "Table is being created";
         QSqlQuery query(m_database);
-        query.exec("create table " + tableName() + " ("
-                                                   "id integer primary key autoincrement,"
-                                                   "path text,"
-                                                   "playlist_id integer"
-                                                   ")");
+        QString queryString = QStringLiteral
+                ("create table %1 (id integer primary key, path text unique)")
+                .arg(tableName());
+        if (!query.exec(queryString))
+            qDebug() << "Creation of table failed:" << query.lastError().text();
     }
+    updateCache();
 
-    QSqlQuery music = m_database.exec("select * from " + tableName());
-    saveToCache(music);
+    int maxId = -1;
+    for (const auto &music : m_music) {
+        if (maxId < music.id)
+            maxId = music.id;
+    }
+    m_idCounter = maxId + 1;
 }
 
-QString MusicDAO::tableName() const
+QString MusicDAO::tableName()
 {
     return "music";
 }
 
 const std::vector<Music> &MusicDAO::getAll()
 {
-    if (m_dirty) {
-        QSqlQuery query = m_database.exec("select * from " + tableName());
-        saveToCache(query);
-        m_dirty = false;
-    }
+    updateCache();
     return m_music;
 }
 
-const Music &MusicDAO::getMusic(int id)
+int MusicDAO::findByPath(const QUrl &path) const
 {
-    if (id < 0)
-        throw std::out_of_range("MusicDAO::getMusic: invalid id");
-
-    // reset cache if dirty
-    getAll();
-
-    auto itr = std::find_if(m_music.begin(), m_music.end(),
-                         [&id] (const Music &music)
+    return std::find_if(m_music.cbegin(), m_music.cend(),
+                        [&path] (const Music &music)
     {
-        return music.id == id;
-    });
-
-    if (itr == m_music.end())
-        throw std::out_of_range("MusicDAO::getMusic: invalid id");
-
-    return *itr;
+        return music.path == path;
+    })->id;
 }
 
-void MusicDAO::createMusic(const Music &music)
+int MusicDAO::createMusic(const QUrl &path)
 {
-    if (music.id < 0 || music.path.isEmpty() || music.playlistId < 0)
+    if (!path.isValid())
         throw invalid_input();
 
     QSqlQuery query(m_database);
-    query.exec("insert into " + tableName() + " (id, name, playlist_id) values("
-               + music.id + ", " + music.path.url() + ", "
-               + music.playlistId + ")");
-    m_music.emplace_back(music);
-    // not setting dirty to true since its easy to simply add it to cache
+    QString queryString = QStringLiteral
+            ("insert into %1 (id, path) values (%2, '%3')")
+            .arg(tableName())
+            .arg(m_idCounter)
+            .arg(path.url());
+    if (!query.exec(queryString)) {
+        queryString = QStringLiteral("select id from %1 where path = '%2'")
+                .arg(tableName())
+                .arg(path.url());
+        query.exec(queryString);
+        query.next();
+        return query.value(0).toInt();
+    }
+
+    m_music.emplace_back(Music{ m_idCounter, path });
+    return m_idCounter++;
 }
 
 void MusicDAO::updateMusic(const Music &music)
 {
-    if (music.id < 0 || music.path.isEmpty() || music.playlistId < 0)
+    if (music.id < 0 || music.path.isEmpty())
         throw invalid_input();
 
     QSqlQuery query(m_database);
-    query.exec("update " + tableName() + " set path = " + music.path.url()
-               + ", playlist_id = " + music.playlistId
-               + " where id = " + music.id);
+    QString queryString = QStringLiteral
+            ("update %1 set path = '%2' where id = %3")
+            .arg(tableName())
+            .arg(music.path.url())
+            .arg(music.id);
+    query.exec(queryString);
     m_dirty = true;
 }
 
@@ -95,15 +99,23 @@ void MusicDAO::deleteMusic(int id)
         throw std::out_of_range("PlaylistDAO::deletePlaylist: invalid id");
 
     QSqlQuery query(m_database);
-    query.exec("delete from " + tableName() + " where id = " + id);
+    QString queryString = QStringLiteral("delete from %1 where id = %2")
+            .arg(tableName())
+            .arg(id);
+    query.exec(queryString);
     m_dirty = true;
 }
 
-void MusicDAO::saveToCache(QSqlQuery &result)
+void MusicDAO::updateCache()
 {
+    if (!m_dirty)
+        return;
+
+    QSqlQuery result = m_database.exec("select id, path from " + tableName());
+    m_music.clear();
     while (result.next()) {
         m_music.emplace_back(Music{ result.value(0).toInt(),
-                                    result.value(1).toString(),
-                                    result.value(2).toInt() });
+                                    result.value(1).toString() });
     }
+    m_dirty = false;
 }

@@ -38,7 +38,7 @@ void RootDirDAO::init()
     m_idCounter = maxId + 1;
 }
 
-QString RootDirDAO::tableName() const
+QString RootDirDAO::tableName()
 {
     return "rootdir";
 }
@@ -76,7 +76,7 @@ void RootDirDAO::updateCache()
     if (!m_dirty)
         return;
 
-    QSqlQuery result = m_database.exec("select * from " + tableName());
+    QSqlQuery result = m_database.exec("select id, path from " + tableName());
     m_rootDirs.clear();
     while (result.next()) {
         m_rootDirs.emplace_back(Directory{ result.value(0).toInt(),

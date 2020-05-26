@@ -7,10 +7,11 @@ Menu {
     transformOrigin: Popup.TopRight
     topPadding: dp(5)
     bottomPadding: dp(5)
+    width: dp(120)
 
     background: AppPaper {
         height: implicitContentHeight + root.topPadding + root.bottomPadding
-        implicitWidth: dp(120)
+        implicitWidth: root.width
     }
 
     delegate: MenuItem {
@@ -20,6 +21,9 @@ Menu {
 
         contentItem: AppText {
             text: menuItem.text
+            width: parent.width
+            wrapMode: Text.NoWrap
+            elide: Text.ElideRight
         }
 
         background: Item {}

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QObject>
 #include <QString>
 #include <QSqlDatabase>
 
@@ -9,7 +10,7 @@ class invalid_input : public std::bad_exception
 {
 };
 
-class AbstractDAO
+class AbstractDAO : public QObject
 {
 public:
     AbstractDAO(QSqlDatabase &database)
@@ -22,7 +23,6 @@ public:
     }
 
     virtual void init() = 0;
-    virtual QString tableName() const = 0;
 
 protected:
     QSqlDatabase &m_database;

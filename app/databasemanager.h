@@ -9,6 +9,7 @@
 class RootDirDAO;
 class PlaylistDAO;
 class MusicDAO;
+class PlaylistMusicDAO;
 
 class DatabaseManager
 {
@@ -19,6 +20,7 @@ public:
     RootDirDAO *getRootDirDAO();
     PlaylistDAO *getPlaylistDAO();
     MusicDAO *getMusicDAO();
+    PlaylistMusicDAO *getPlaylistMusicDAO();
 
 private:
     QSqlDatabase m_database;

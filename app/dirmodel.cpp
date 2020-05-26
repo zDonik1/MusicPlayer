@@ -28,11 +28,12 @@ void DirModel::setupModel(const std::map<QString, QStringList> &map)
     endResetModel();
 }
 
-void DirModel::toggleDir(int index)
+void DirModel::toggleDir(const QModelIndex &index)
 {
-    m_dirEntryInfo.at(index)["isOpen"] = !m_dirEntryInfo.at(index)["isOpen"].toBool();
+    m_dirEntryInfo.at(index.row())["isOpen"]
+            = !m_dirEntryInfo.at(index.row())["isOpen"].toBool();
     int i;
-    for (i = index + 1; ; ++i) {
+    for (i = index.row() + 1; ; ++i) {
         if (i >= static_cast<int>(m_dirEntryInfo.size())
                 || m_dirEntryInfo.at(i)["isDir"].toBool())
         {
@@ -42,7 +43,39 @@ void DirModel::toggleDir(int index)
         auto &isOpen = m_dirEntryInfo.at(i)["isOpen"];
         isOpen = !isOpen.toBool();
     }
-    dataChanged(createIndex(index, 0), createIndex(i, 0), { Roles::IsOpen });
+    dataChanged(index, createIndex(i, 0), { Roles::IsOpen });
+}
+
+std::unique_ptr<std::vector<QString>> DirModel::getFilesInDir(
+        const QModelIndex &index) const
+{
+    auto result = std::make_unique<std::vector<QString>>();
+    if (!m_dirEntryInfo.at(index.row())["isDir"].toBool())
+        return result;
+
+    QString dirpath = m_dirEntryInfo.at(index.row())["filename"].toString();
+    for (int i = index.row() + 1; ; ++i) {
+        if (i >= static_cast<int>(m_dirEntryInfo.size())
+                || m_dirEntryInfo.at(i)["isDir"].toBool())
+        {
+            break;
+        }
+
+        result->push_back(dirpath
+                          + m_dirEntryInfo.at(i)["filename"].toString());
+    }
+    return result;
+}
+
+QString DirModel::getFile(const QModelIndex &index) const
+{
+    for (int i = index.row() - 1; i >= 0; --i) {
+        if (m_dirEntryInfo.at(i)["isDir"].toBool()) {
+            return m_dirEntryInfo.at(i)["filename"].toString()
+                    + m_dirEntryInfo.at(index.row())["filename"].toString();
+        }
+    }
+    return QString();
 }
 
 int DirModel::rowCount(const QModelIndex &/*parent*/) const
