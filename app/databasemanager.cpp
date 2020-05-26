@@ -8,6 +8,7 @@
 #include "playlistdao.h"
 #include "musicdao.h"
 #include "playlistmusicdao.h"
+#include "settingsdao.h"
 
 using namespace std;
 
@@ -42,6 +43,7 @@ DatabaseManager::DatabaseManager()
     m_daos["playlist"] = make_unique<PlaylistDAO>(m_database);
     m_daos["music"] = make_unique<MusicDAO>(m_database);
     m_daos["playlist_music"] = make_unique<PlaylistMusicDAO>(m_database);
+    m_daos["setting"] = make_unique<SettingsDAO>(m_database);
 
     for (const auto &pair : m_daos) {
         pair.second->init();
@@ -71,4 +73,9 @@ MusicDAO *DatabaseManager::getMusicDAO()
 PlaylistMusicDAO *DatabaseManager::getPlaylistMusicDAO()
 {
     return dynamic_cast<PlaylistMusicDAO *>(m_daos.at("playlist_music").get());
+}
+
+SettingsDAO *DatabaseManager::getSettingsDAO()
+{
+    return dynamic_cast<SettingsDAO *>(m_daos.at("setting").get());
 }

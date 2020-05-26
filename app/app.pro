@@ -53,7 +53,8 @@ SOURCES += main.cpp \
     playlistmodel.cpp \
     playlistmusicdao.cpp \
     rootdirdao.cpp \
-    rootdirmodel.cpp
+    rootdirmodel.cpp \
+    settingsdao.cpp
 
 HEADERS += \
     abstractdao.h \
@@ -72,7 +73,8 @@ HEADERS += \
     playlistmodel.h \
     playlistmusicdao.h \
     rootdirdao.h \
-    rootdirmodel.h
+    rootdirmodel.h \
+    settingsdao.h
 
 android {
     ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android

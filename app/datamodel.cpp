@@ -43,6 +43,8 @@ DataModel::DataModel(DatabaseManager &databaseManager,
     m_playlistModel->setPlaylists(playlists);
 
     m_rootDirModel->setRootDirs(m_databaseManager.getRootDirDAO()->getAll());
+
+    // TODO: setup musicmodel using settingsdao
 }
 
 DirModel *DataModel::getDirModel()

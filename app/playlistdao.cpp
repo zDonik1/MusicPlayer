@@ -2,7 +2,7 @@
 
 #include <QSqlQuery>
 #include <QStringList>
-#include <QDebug>
+#include <QVariant>
 #include <algorithm>
 
 PlaylistDAO::PlaylistDAO(QSqlDatabase &database)
@@ -17,12 +17,11 @@ PlaylistDAO::~PlaylistDAO()
 void PlaylistDAO::init()
 {
     if (!m_database.tables().contains(tableName())) {
-        qDebug() << "Table is being created";
         QSqlQuery query(m_database);
-        query.exec("create table " + tableName() + " ("
-                                                   "id integer primary key,"
-                                                   "name text"
-                                                   ")");
+        QString queryString = QStringLiteral
+                ("create table %1 (id integer primary key, name text)")
+                .arg(tableName());
+        query.exec(queryString);
     }
     updateCache();
 
