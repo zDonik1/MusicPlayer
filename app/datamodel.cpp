@@ -25,6 +25,7 @@ DataModel::DataModel(DatabaseManager &databaseManager,
     , m_dirModel(new DirModel)
     , m_rootDirModel(new RootDirModel)
     , m_playlistModel(new PlaylistModel)
+    , m_musicModel(new MusicModel)
 {
     connect(m_databaseManager.getPlaylistMusicDAO(),
             &PlaylistMusicDAO::musicAddedToPlaylist,

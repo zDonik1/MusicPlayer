@@ -9,6 +9,7 @@
 #include "dirmodel.h"
 #include "rootdirmodel.h"
 #include "playlistmodel.h"
+#include "musicmodel.h"
 
 class DataModel : public QObject
 {
@@ -62,4 +63,5 @@ private:
     std::unique_ptr<DirModel> m_dirModel;
     std::unique_ptr<RootDirModel> m_rootDirModel;
     std::unique_ptr<PlaylistModel> m_playlistModel;
+    std::unique_ptr<MusicModel> m_musicModel;
 };

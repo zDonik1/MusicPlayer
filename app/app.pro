@@ -48,6 +48,7 @@ SOURCES += main.cpp \
     dirmodel.cpp \
     musicaddworker.cpp \
     musicdao.cpp \
+    musicmodel.cpp \
     playlistdao.cpp \
     playlistmodel.cpp \
     playlistmusicdao.cpp \
@@ -65,6 +66,7 @@ HEADERS += \
     music.h \
     musicaddworker.h \
     musicdao.h \
+    musicmodel.h \
     playlist.h \
     playlistdao.h \
     playlistmodel.h \
