@@ -6,6 +6,17 @@ MusicModel::MusicModel()
 {
 }
 
+int MusicModel::getCurrentPlaylist()
+{
+    return m_currentPlaylist;
+}
+
+void MusicModel::setCurrentPlaylist(int playlistId)
+{
+    m_currentPlaylist = playlistId;
+    emit currentPlaylistChanged();
+}
+
 void MusicModel::setMusic(const std::vector<Music> &music)
 {
     beginResetModel();

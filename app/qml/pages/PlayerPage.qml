@@ -7,31 +7,6 @@ Page {
     id: root
     title: qsTr("Music Player")
 
-    ListModel {
-        id: musicModel
-
-        ListElement {
-            musicTitle: "Tommee Profitt - Enemy (feat. Beacon Light & Sam Tinnesz)"
-            musicImage: ""
-            musicDuration: "3:30"
-        }
-        ListElement {
-            musicTitle: "Generdyn - Destiny (feat. Krigare)"
-            musicImage: ""
-            musicDuration: "4:34"
-        }
-        ListElement {
-            musicTitle: "KLOUD - Humans (Far Out Remix)"
-            musicImage: ""
-            musicDuration: "3:41"
-        }
-        ListElement {
-            musicTitle: "BlackGummy - Superhuman (feat. Colleen D'Agostino) (BlackStation Remix)"
-            musicImage: ""
-            musicDuration: "3:20"
-        }
-    }
-
     AppListView {
         property int selected: -1
 
@@ -42,18 +17,42 @@ Page {
             left: parent.left
             bottom: controllerColumn.top
         }
-        model: musicModel
+        model: dataModel.musicModel
 
         delegate: MusicDelegate {
             backgroundColor: index === listView.selected
                              ? Theme.listItem.selectedBackgroundColor
                              : Theme.backgroundColor
+            title: r_title
+            duration: ""
+            image: ""
 
             onClicked: {
                 listView.selected = index
                 logic.musicChanged(index)
             }
         }
+    }
+
+    AppButton {
+        // '0' - no playlist, '1' - no music, '-1' - no intent
+        property int intent: dataModel.musicModel.currentPlaylist === -1
+                                ? 0 : (listView.count === 0 ? 1 : -1)
+
+        anchors.centerIn: parent
+        text: intent === 0
+              ? qsTr("Select a playlist")
+              : (intent === 1
+                 ? qsTr("Add music")
+                 : "")
+        flat: true
+        visible: intent !== ""
+        enabled: visible
+
+        onClicked: if (intent === 0)
+                       navigation.currentIndex = 1
+                   else
+                       navigation.currentIndex = 2
     }
 
     Column {

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "abstractdao.h"
+#include "music.h"
 
 class PlaylistMusicDAO : public AbstractDAO
 {
@@ -13,7 +14,8 @@ public:
     void init() override;
     static QString tableName();
 
-    int getMusicCount(int playlistId);
+    int getMusicCount(int playlistId) const;
+    std::vector<Music> getMusicForPlaylist(int playlistId) const;
 
     void addMusicToPlaylist(int musicId, int playlistId);
     void deleteMusicFromPlaylist(int musicId, int playlistId);

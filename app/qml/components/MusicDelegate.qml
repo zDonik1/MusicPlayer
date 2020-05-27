@@ -6,6 +6,9 @@ Item {
     signal clicked()
 
     property alias backgroundColor: background.color
+    property alias title: textTitle.text
+    property alias duration: textDuration.text
+    property string image: ""
 
     id: root
     width: parent.width
@@ -32,22 +35,21 @@ Item {
             clip: true
 
             Image {
-                id: image
+                id: imageMusic
 
                 anchors.centerIn: parent
-                height: musicImage !== ""
+                height: image !== ""
                         ? parent.height : dp(30)
                 width: height
                 fillMode: Image.PreserveAspectCrop
-                source: musicImage !== ""
-                        ? musicImage : "../../assets/audiotrack.png"
+                source: image !== "" ? image : "../../assets/audiotrack.png"
                 visible: false
             }
 
             ColorOverlay {
-                anchors.fill: image
-                color: "white"
-                source: image
+                anchors.fill: imageMusic
+                color: image !== "" ? "transparent" : "white"
+                source: imageMusic
             }
         }
     }
@@ -65,7 +67,6 @@ Item {
         maximumLineCount: 2
         elide: Text.ElideRight
         wrapMode: Text.Wrap
-        text: musicTitle
     }
 
     Item {
@@ -78,10 +79,10 @@ Item {
         width: dp(40)
 
         AppText {
+            id: textDuration
             anchors.horizontalCenter: parent.horizontalCenter
             color: Theme.secondaryTextColor
             y: dp(13)
-            text: musicDuration
             fontSize: 14
         }
     }

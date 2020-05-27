@@ -15,6 +15,7 @@
 #include "playlistdao.h"
 #include "musicdao.h"
 #include "playlistmusicdao.h"
+#include "settingsdao.h"
 #include "musicaddworker.h"
 
 DataModel::DataModel(DatabaseManager &databaseManager,
@@ -42,9 +43,21 @@ DataModel::DataModel(DatabaseManager &databaseManager,
     }
     m_playlistModel->setPlaylists(playlists);
 
+    // setting up rootdirs
     m_rootDirModel->setRootDirs(m_databaseManager.getRootDirDAO()->getAll());
 
-    // TODO: setup musicmodel using settingsdao
+    // setting up music
+    QVariant value = m_databaseManager.getSettingsDAO()
+            ->getValue("current_playlist");
+    if (!value.isValid()) {
+        m_musicModel->setCurrentPlaylist(-1);
+    }
+    else {
+        m_musicModel->setCurrentPlaylist(value.toInt());
+        auto music = m_databaseManager.getPlaylistMusicDAO()
+                ->getMusicForPlaylist(value.toInt());
+        m_musicModel->setMusic(music);
+    }
 }
 
 DirModel *DataModel::getDirModel()
@@ -60,6 +73,11 @@ RootDirModel *DataModel::getRootDirModel()
 PlaylistModel *DataModel::getPlaylistModel()
 {
     return m_playlistModel.get();
+}
+
+MusicModel *DataModel::getMusicModel()
+{
+    return m_musicModel.get();
 }
 
 void DataModel::play()
@@ -106,6 +124,16 @@ void DataModel::musicChanged(int index)
     m_binder.transact(MessageType::SEEK, sendData, &replyData);
 }
 
+void DataModel::playlistSelected(int index)
+{
+    int id = m_playlistModel->getPlaylist(m_playlistModel->index(index)).id;
+    m_musicModel->setCurrentPlaylist(id);
+    auto music = m_databaseManager.getPlaylistMusicDAO()
+            ->getMusicForPlaylist(id);
+    m_musicModel->setMusic(music);
+    m_databaseManager.getSettingsDAO()->storeValue("current_playlist", id);
+}
+
 void DataModel::playlistAdded(QString name)
 {
     int id = m_databaseManager.getPlaylistDAO()->createPlaylist(name);
@@ -122,6 +150,11 @@ void DataModel::playlistDeleted(int index)
 {
     int id = m_playlistModel->deletePlaylist(m_playlistModel->index(index));
     m_databaseManager.getPlaylistDAO()->deletePlaylist(id);
+    if (id == m_musicModel->getCurrentPlaylist()) {
+        m_musicModel->setCurrentPlaylist(-1);
+        m_musicModel->setMusic({});
+        m_databaseManager.getSettingsDAO()->storeValue("current_playlist", -1);
+    }
 }
 
 void DataModel::refreshDirs()

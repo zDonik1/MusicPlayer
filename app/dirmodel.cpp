@@ -71,7 +71,7 @@ QString DirModel::getFile(const QModelIndex &index) const
 {
     for (int i = index.row() - 1; i >= 0; --i) {
         if (m_dirEntryInfo.at(i)["isDir"].toBool()) {
-            return m_dirEntryInfo.at(i)["filename"].toString()
+            return m_dirEntryInfo.at(i)["filename"].toString() + "/"
                     + m_dirEntryInfo.at(index.row())["filename"].toString();
         }
     }

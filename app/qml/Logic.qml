@@ -9,6 +9,7 @@ Item {
     signal repeat()
     signal musicChanged(int index)
 
+    signal playlistSelected(int index)
     signal playlistAdded(string name)
     signal playlistEdited(int index, string name)
     signal playlistDeleted(int index)

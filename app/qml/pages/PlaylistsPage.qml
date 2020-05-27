@@ -25,6 +25,11 @@ Page {
             name: r_name
             description: "Songs: " + r_musicCount
 
+            onClicked: {
+                logic.playlistSelected(index)
+                navigation.currentIndex = 0
+            }
+
             onEditClicked: {
                 editedPlaylistIndex = index
                 dialogEdit.contentText = name

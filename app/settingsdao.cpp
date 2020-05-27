@@ -53,7 +53,7 @@ QVariant SettingsDAO::getValue(const QString &key)
     if (key.isEmpty())
         return QVariant();
 
-    return m_map[key];
+    return m_map.value(key, QVariant());
 }
 
 bool SettingsDAO::storeValue(const QString &key, const QString &value)
@@ -74,7 +74,7 @@ bool SettingsDAO::storeValue(const QString &key, const QString &value,
 
     QSqlQuery query(m_database);
     QString queryString = QStringLiteral
-            ("insert into %1 (mykey, myvalue, mytype) values ('%2', '%3', %4")
+            ("insert into %1 (mykey, myvalue, mytype) values ('%2', '%3', %4)")
             .arg(tableName())
             .arg(key)
             .arg(value)

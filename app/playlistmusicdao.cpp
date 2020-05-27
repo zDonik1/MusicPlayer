@@ -38,7 +38,7 @@ QString PlaylistMusicDAO::tableName()
     return "playlist_music";
 }
 
-int PlaylistMusicDAO::getMusicCount(int playlistId)
+int PlaylistMusicDAO::getMusicCount(int playlistId) const
 {
     if (playlistId < 0)
         throw std::out_of_range("PlaylistMusicDAO::addMusicToPlaylist: "
@@ -47,13 +47,39 @@ int PlaylistMusicDAO::getMusicCount(int playlistId)
     QSqlQuery query(m_database);
     QString queryString = QStringLiteral
             ("select count(*) from %1 where playlist_id = %2")
-            .arg(tableName()).arg(playlistId);
+            .arg(tableName())
+            .arg(playlistId);
     if (!query.exec(queryString)) {
         qDebug() << "Count failed:" << query.lastError().text();
         return -1;
     }
     query.next();
     return query.value(0).toInt();
+}
+
+std::vector<Music> PlaylistMusicDAO::getMusicForPlaylist(int playlistId) const
+{
+    if (playlistId < 0)
+        throw std::out_of_range("PlaylistMusicDAO::addMusicToPlaylist: "
+                                "playlistId is out of range");
+
+    QSqlQuery query(m_database);
+    QString queryString = QStringLiteral
+            ("select %1.music_id, %2.path from %1 "
+             "inner join %2 on %1.music_id = %2.id where playlist_id = %3")
+            .arg(tableName())
+            .arg(MusicDAO::tableName())
+            .arg(playlistId);
+    if (!query.exec(queryString)) {
+        qDebug() << "Music select failed:" << query.lastError().text();
+    }
+
+    std::vector<Music> result;
+    while (query.next()) {
+        result.emplace_back(Music{ query.value(0).toInt(),
+                                   query.value(1).toString() });
+    }
+    return result;
 }
 
 void PlaylistMusicDAO::addMusicToPlaylist(int musicId, int playlistId)

@@ -25,20 +25,23 @@ App {
         onRepeat: dataModel.repeat()
         onMusicChanged: dataModel.musicChanged(index)
 
+        onPlaylistSelected: dataModel.playlistSelected(index)
+        onPlaylistAdded: dataModel.playlistAdded(name)
+        onPlaylistEdited: dataModel.playlistEdited(index, name)
+        onPlaylistDeleted: dataModel.playlistDeleted(index)
+
         onDirToggled: dataModel.toggleDir(index)
         onAddDirToPlaylist: dataModel.addDirToPlaylist(dirIndex, playlistIndex)
         onAddMusicToPlaylist: dataModel.addMusicToPlaylist(musicIndex, playlistIndex)
         onDeleteMusicFromMemory: dataModel.addMusicToPlaylist(index)
-
-        onPlaylistAdded: dataModel.playlistAdded(name)
-        onPlaylistEdited: dataModel.playlistEdited(index, name)
-        onPlaylistDeleted: dataModel.playlistDeleted(index)
 
         onMusicRootDirAdded: dataModel.musicRootDirAdded(path)
         onMusicRootDirDeleted: dataModel.musicRootDirDeleted(index)
     }
 
     Navigation {
+        id: navigation
+
         NavigationItem {
             title: qsTr("Player")
             icon: IconType.play

@@ -20,6 +20,8 @@ class DataModel : public QObject
                NOTIFY rootDirModelChanged)
     Q_PROPERTY(PlaylistModel *playlistModel READ getPlaylistModel
                NOTIFY playlistModelChanged)
+    Q_PROPERTY(MusicModel *musicModel READ getMusicModel
+               NOTIFY musicModelChanged)
 
 public:
     explicit DataModel(DatabaseManager &databaseManager,
@@ -28,6 +30,7 @@ public:
     DirModel *getDirModel();
     RootDirModel *getRootDirModel();
     PlaylistModel *getPlaylistModel();
+    MusicModel *getMusicModel();
 
 public slots:
     void play();
@@ -38,6 +41,7 @@ public slots:
     void repeat();
     void musicChanged(int index);
 
+    void playlistSelected(int index);
     void playlistAdded(QString name);
     void playlistEdited(int index, QString name);
     void playlistDeleted(int index);
@@ -55,6 +59,7 @@ signals:
     void dirModelChanged();
     void rootDirModelChanged();
     void playlistModelChanged();
+    void musicModelChanged();
 
 private:
     DatabaseManager &m_databaseManager;
