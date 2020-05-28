@@ -38,6 +38,16 @@ void RootDirDAO::init()
     m_idCounter = maxId + 1;
 }
 
+void RootDirDAO::reset()
+{
+    if (m_database.tables().contains(tableName())) {
+        QSqlQuery query(m_database);
+        QString queryString = QStringLiteral("drop table %1")
+                .arg(tableName());
+        query.exec(queryString);
+    }
+}
+
 QString RootDirDAO::tableName()
 {
     return "rootdir";

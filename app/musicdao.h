@@ -14,6 +14,7 @@ public:
     ~MusicDAO() override;
 
     void init() override;
+    void reset() override;
     static QString tableName();
 
     const std::vector<Music> &getAll();

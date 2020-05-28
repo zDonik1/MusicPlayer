@@ -11,6 +11,7 @@ public:
     ~SettingsDAO() override;
 
     void init() override;
+    void reset() override;
     static QString tableName();
 
     QVariant getValue(const QString &key);

@@ -23,8 +23,7 @@ public:
 
     int getCurrentPlaylist();
 
-    void setCurrentPlaylist(int playlistId);
-    void setMusic(const std::vector<Music> &music);
+    void setMusic(int playlistId, const std::vector<Music> &music);
     void addMusic(const Music &music);
     void deleteMusic(const QModelIndex &index);
 

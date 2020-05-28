@@ -23,20 +23,22 @@ App {
         onSeek: dataModel.seek(position)
         onShuffle: dataModel.shuffle()
         onRepeat: dataModel.repeat()
-        onMusicChanged: dataModel.musicChanged(index)
+        onMusicChanged: dataModel.changeMusic(index)
 
-        onPlaylistSelected: dataModel.playlistSelected(index)
-        onPlaylistAdded: dataModel.playlistAdded(name)
-        onPlaylistEdited: dataModel.playlistEdited(index, name)
-        onPlaylistDeleted: dataModel.playlistDeleted(index)
+        onPlaylistSelected: dataModel.selectPlaylist(index)
+        onPlaylistAdded: dataModel.addPlaylist(name)
+        onPlaylistEdited: dataModel.editPlaylist(index, name)
+        onPlaylistDeleted: dataModel.deletePlaylist(index)
 
         onDirToggled: dataModel.toggleDir(index)
-        onAddDirToPlaylist: dataModel.addDirToPlaylist(dirIndex, playlistIndex)
-        onAddMusicToPlaylist: dataModel.addMusicToPlaylist(musicIndex, playlistIndex)
-        onDeleteMusicFromMemory: dataModel.addMusicToPlaylist(index)
+        onDirToPlaylistAdded: dataModel.addDirToPlaylist(dirIndex, playlistIndex)
+        onMusicToPlaylistAdded: dataModel.addMusicToPlaylist(musicIndex, playlistIndex)
+        onMusicFromMemoryDeleted: dataModel.addMusicToPlaylist(index)
 
-        onMusicRootDirAdded: dataModel.musicRootDirAdded(path)
-        onMusicRootDirDeleted: dataModel.musicRootDirDeleted(index)
+        onMusicRootDirAdded: dataModel.addMusicRootDir(path)
+        onMusicRootDirDeleted: dataModel.deleteMusicRootDir(index)
+
+        onTablesDropped: dataModel.dropTables();
     }
 
     Navigation {
@@ -73,6 +75,27 @@ App {
                 transitionDelegate: transitionDelegateiOS
 
                 FilePage {
+                }
+            }
+        }
+
+        NavigationItem {
+            title: qsTr("Dev tools")
+            icon: IconType.codepen
+
+            NavigationStack {
+                Page {
+                    title: qsTr("Dev tools")
+
+                    Column {
+                        anchors.centerIn: parent
+
+                        AppButton {
+                            text: qsTr("Drop all tables")
+
+                            onClicked: logic.tablesDropped()
+                        }
+                    }
                 }
             }
         }

@@ -24,6 +24,8 @@ public:
     PlaylistMusicDAO *getPlaylistMusicDAO();
     SettingsDAO *getSettingsDAO();
 
+    void resetAllDAOs();
+
 private:
     QSqlDatabase m_database;
     std::map<QString, std::unique_ptr<AbstractDAO>> m_daos;

@@ -15,10 +15,12 @@ Item {
     signal playlistDeleted(int index)
 
     signal dirToggled(int index)
-    signal addDirToPlaylist(int dirIndex, int playlistIndex)
-    signal addMusicToPlaylist(int musicIndex, int playlistIndex)
-    signal deleteMusicFromMemory(int index)
+    signal dirToPlaylistAdded(int dirIndex, int playlistIndex)
+    signal musicToPlaylistAdded(int musicIndex, int playlistIndex)
+    signal musicFromMemoryDeleted(int index)
 
     signal musicRootDirAdded(url path)
     signal musicRootDirDeleted(int index)
+
+    signal tablesDropped()
 }

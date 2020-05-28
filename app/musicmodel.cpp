@@ -11,17 +11,17 @@ int MusicModel::getCurrentPlaylist()
     return m_currentPlaylist;
 }
 
-void MusicModel::setCurrentPlaylist(int playlistId)
+void MusicModel::setMusic(int playlistId, const std::vector<Music> &music)
 {
-    m_currentPlaylist = playlistId;
-    emit currentPlaylistChanged();
-}
+    if (playlistId < -1)
+        return;
 
-void MusicModel::setMusic(const std::vector<Music> &music)
-{
     beginResetModel();
     m_music = std::move(music);
     endResetModel();
+
+    m_currentPlaylist = playlistId;
+    emit currentPlaylistChanged();
 }
 
 void MusicModel::addMusic(const Music &music)

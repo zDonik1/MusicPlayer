@@ -12,10 +12,13 @@ public:
     ~PlaylistMusicDAO() override;
 
     void init() override;
+    void reset() override;
     static QString tableName();
 
     int getMusicCount(int playlistId) const;
     std::vector<Music> getMusicForPlaylist(int playlistId) const;
+
+    void deletePlaylist(int id);
 
     void addMusicToPlaylist(int musicId, int playlistId);
     void deleteMusicFromPlaylist(int musicId, int playlistId);

@@ -79,3 +79,10 @@ SettingsDAO *DatabaseManager::getSettingsDAO()
 {
     return dynamic_cast<SettingsDAO *>(m_daos.at("setting").get());
 }
+
+void DatabaseManager::resetAllDAOs()
+{
+    for (const auto &pair : m_daos) {
+        pair.second->reset();
+    }
+}

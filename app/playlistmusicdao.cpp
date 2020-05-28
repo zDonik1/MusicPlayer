@@ -33,6 +33,16 @@ void PlaylistMusicDAO::init()
     }
 }
 
+void PlaylistMusicDAO::reset()
+{
+    if (m_database.tables().contains(tableName())) {
+        QSqlQuery query(m_database);
+        QString queryString = QStringLiteral("drop table %1")
+                .arg(tableName());
+        query.exec(queryString);
+    }
+}
+
 QString PlaylistMusicDAO::tableName()
 {
     return "playlist_music";
@@ -82,6 +92,20 @@ std::vector<Music> PlaylistMusicDAO::getMusicForPlaylist(int playlistId) const
     return result;
 }
 
+void PlaylistMusicDAO::deletePlaylist(int id)
+{
+    if (id < 0)
+        throw std::out_of_range("PlaylistMusicDAO::deletePlaylist: "
+                                "id is out of range");
+
+    QSqlQuery query(m_database);
+    QString queryString = QStringLiteral
+            ("delete from %1 where playlist_id = %2")
+            .arg(tableName())
+            .arg(id);
+    query.exec(queryString);
+}
+
 void PlaylistMusicDAO::addMusicToPlaylist(int musicId, int playlistId)
 {
     if (musicId < 0 || playlistId < 0)
@@ -99,7 +123,7 @@ void PlaylistMusicDAO::addMusicToPlaylist(int musicId, int playlistId)
 void PlaylistMusicDAO::deleteMusicFromPlaylist(int musicId, int playlistId)
 {
     if (musicId < 0 || playlistId < 0)
-        throw std::out_of_range("PlaylistMusicDAO::addMusicToPlaylist: "
+        throw std::out_of_range("PlaylistMusicDAO::deleteMusicFromPlaylist: "
                                 "musicId or playlistId is out of range");
 
     QSqlQuery query(m_database);

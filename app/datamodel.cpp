@@ -50,13 +50,12 @@ DataModel::DataModel(DatabaseManager &databaseManager,
     QVariant value = m_databaseManager.getSettingsDAO()
             ->getValue("current_playlist");
     if (!value.isValid()) {
-        m_musicModel->setCurrentPlaylist(-1);
+        m_musicModel->setMusic(-1, {});
     }
     else {
-        m_musicModel->setCurrentPlaylist(value.toInt());
         auto music = m_databaseManager.getPlaylistMusicDAO()
                 ->getMusicForPlaylist(value.toInt());
-        m_musicModel->setMusic(music);
+        m_musicModel->setMusic(value.toInt(), music);
     }
 }
 
@@ -117,42 +116,41 @@ void DataModel::repeat()
     m_binder.transact(MessageType::REPEAT, sendData, &replyData);
 }
 
-void DataModel::musicChanged(int index)
+void DataModel::changeMusic(int index)
 {
     QAndroidParcel sendData, replyData;
     sendData.writeVariant(index);
     m_binder.transact(MessageType::SEEK, sendData, &replyData);
 }
 
-void DataModel::playlistSelected(int index)
+void DataModel::selectPlaylist(int index)
 {
     int id = m_playlistModel->getPlaylist(m_playlistModel->index(index)).id;
-    m_musicModel->setCurrentPlaylist(id);
     auto music = m_databaseManager.getPlaylistMusicDAO()
             ->getMusicForPlaylist(id);
-    m_musicModel->setMusic(music);
+    m_musicModel->setMusic(id, music);
     m_databaseManager.getSettingsDAO()->storeValue("current_playlist", id);
 }
 
-void DataModel::playlistAdded(QString name)
+void DataModel::addPlaylist(QString name)
 {
     int id = m_databaseManager.getPlaylistDAO()->createPlaylist(name);
     m_playlistModel->addPlaylist({ id, name });
 }
 
-void DataModel::playlistEdited(int index, QString name)
+void DataModel::editPlaylist(int index, QString name)
 {
     int id = m_playlistModel->editPlaylist(m_playlistModel->index(index), name);
     m_databaseManager.getPlaylistDAO()->updatePlaylist({ id, name });
 }
 
-void DataModel::playlistDeleted(int index)
+void DataModel::deletePlaylist(int index)
 {
     int id = m_playlistModel->deletePlaylist(m_playlistModel->index(index));
     m_databaseManager.getPlaylistDAO()->deletePlaylist(id);
+    m_databaseManager.getPlaylistMusicDAO()->deletePlaylist(id);
     if (id == m_musicModel->getCurrentPlaylist()) {
-        m_musicModel->setCurrentPlaylist(-1);
-        m_musicModel->setMusic({});
+        m_musicModel->setMusic(-1, {});
         m_databaseManager.getSettingsDAO()->storeValue("current_playlist", -1);
     }
 }
@@ -226,16 +224,25 @@ void DataModel::deleteMusicFromMemory(int index)
     m_databaseManager.getMusicDAO()->deleteMusic(id);
 }
 
-void DataModel::musicRootDirAdded(const QUrl &path)
+void DataModel::addMusicRootDir(const QUrl &path)
 {
     int id = m_databaseManager.getRootDirDAO()->createDir(path.path());
     m_rootDirModel->addRootDir({ id, path.path() });
     refreshDirs();
 }
 
-void DataModel::musicRootDirDeleted(int index)
+void DataModel::deleteMusicRootDir(int index)
 {
     int id = m_rootDirModel->deleteRootDir(m_rootDirModel->index(index));
     m_databaseManager.getRootDirDAO()->deleteDir(id);
     refreshDirs();
+}
+
+void DataModel::dropTables()
+{
+    m_databaseManager.resetAllDAOs();
+    m_dirModel->setupModel({});
+    m_rootDirModel->setRootDirs({});
+    m_playlistModel->setPlaylists({});
+    m_musicModel->setMusic(-1, {});
 }

@@ -43,6 +43,16 @@ void SettingsDAO::init()
     }
 }
 
+void SettingsDAO::reset()
+{
+    if (m_database.tables().contains(tableName())) {
+        QSqlQuery query(m_database);
+        QString queryString = QStringLiteral("drop table %1")
+                .arg(tableName());
+        query.exec(queryString);
+    }
+}
+
 QString SettingsDAO::tableName()
 {
     return "setting";
