@@ -1,6 +1,8 @@
 #include "settingsdao.h"
 
 #include <QSqlQuery>
+#include <QSqlError>
+#include <QDebug>
 
 SettingsDAO::SettingsDAO(QSqlDatabase &database)
     : AbstractDAO(database)
@@ -84,13 +86,15 @@ bool SettingsDAO::storeValue(const QString &key, const QString &value,
 
     QSqlQuery query(m_database);
     QString queryString = QStringLiteral
-            ("insert into %1 (mykey, myvalue, mytype) values ('%2', '%3', %4)")
+            ("replace into %1 (mykey, myvalue, mytype) values ('%2', '%3', %4)")
             .arg(tableName())
             .arg(key)
             .arg(value)
             .arg(type);
-    if (!query.exec(queryString))
+    if (!query.exec(queryString)) {
+        qDebug() << "Failed storing:" << query.lastError().text();
         return false;
+    }
 
     m_map[key] = value;
     return true;

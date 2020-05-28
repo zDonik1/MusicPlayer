@@ -20,6 +20,7 @@ Page {
     AppListView {
         anchors.fill: parent
         model: dataModel.playlistModel
+        emptyText.text: qsTr("No playlists added")
 
         delegate: PlaylistDelegate {
             name: r_name
@@ -48,7 +49,7 @@ Page {
         onAccepted: {
             close()
             logic.playlistAdded(contentText)
-            contentText = ""
+            clearText()
         }
     }
 
@@ -59,7 +60,7 @@ Page {
         onAccepted: {
             close()
             logic.playlistEdited(editedPlaylistIndex, contentText)
-            contentText = ""
+            clearText()
         }
     }
 }

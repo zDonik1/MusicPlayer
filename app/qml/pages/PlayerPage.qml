@@ -5,7 +5,9 @@ import "../components"
 
 Page {
     id: root
-    title: qsTr("Music Player")
+    title: dataModel.currentPlaylistName === ""
+           ? qsTr("Music Player")
+           : dataModel.currentPlaylistName
 
     AppListView {
         property int selected: -1

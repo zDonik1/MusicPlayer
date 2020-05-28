@@ -75,7 +75,7 @@ Page {
                     text: qsTr("Add to playlist")
 
                     onTriggered: {
-                        menuDir.close()
+                        menuFile.close()
                         playlistPopupAdd.fileIndex = index
                         playlistPopupAdd.isAddingDir = false
                         playlistPopupAdd.open()
@@ -102,9 +102,9 @@ Page {
 
         onPlaylistClicked: {
             if (isAddingDir)
-                logic.addDirToPlaylist(fileIndex, index)
+                logic.dirToPlaylistAdded(fileIndex, index)
             else
-                logic.addMusicToPlaylist(fileIndex, index)
+                logic.musicToPlaylistAdded(fileIndex, index)
             close()
         }
     }

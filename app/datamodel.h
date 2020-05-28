@@ -23,6 +23,9 @@ class DataModel : public QObject
     Q_PROPERTY(MusicModel *musicModel READ getMusicModel
                NOTIFY musicModelChanged)
 
+    Q_PROPERTY(QString currentPlaylistName READ getCurrentPlaylistName
+               NOTIFY currentPlaylistNameChanged)
+
 public:
     explicit DataModel(DatabaseManager &databaseManager,
                        const QAndroidBinder &binder, QObject *parent = nullptr);
@@ -31,6 +34,8 @@ public:
     RootDirModel *getRootDirModel();
     PlaylistModel *getPlaylistModel();
     MusicModel *getMusicModel();
+
+    const QString &getCurrentPlaylistName() const;
 
 public slots:
     void play();
@@ -63,6 +68,8 @@ signals:
     void playlistModelChanged();
     void musicModelChanged();
 
+    void currentPlaylistNameChanged();
+
 private:
     DatabaseManager &m_databaseManager;
     const QAndroidBinder &m_binder;
@@ -71,4 +78,6 @@ private:
     std::unique_ptr<RootDirModel> m_rootDirModel;
     std::unique_ptr<PlaylistModel> m_playlistModel;
     std::unique_ptr<MusicModel> m_musicModel;
+
+    QString m_currentPlaylistName;
 };

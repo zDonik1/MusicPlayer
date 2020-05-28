@@ -101,6 +101,7 @@ DISTFILES += \
     qml/components/FilesystemPage.qml \
     qml/components/MusicDelegate.qml \
     qml/components/PlaylistPopup.qml \
+    qml/components/ZPopup.qml \
     qml/pages/FilePage.qml \
     qml/pages/PlayerPage.qml \
     qml/pages/PlaylistsPage.qml \

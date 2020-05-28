@@ -79,6 +79,11 @@ MusicModel *DataModel::getMusicModel()
     return m_musicModel.get();
 }
 
+const QString &DataModel::getCurrentPlaylistName() const
+{
+    return m_currentPlaylistName;
+}
+
 void DataModel::play()
 {
     QAndroidParcel sendData, replyData;
@@ -125,17 +130,20 @@ void DataModel::changeMusic(int index)
 
 void DataModel::selectPlaylist(int index)
 {
-    int id = m_playlistModel->getPlaylist(m_playlistModel->index(index)).id;
+    auto playlist = m_playlistModel->getPlaylist(m_playlistModel->index(index));
     auto music = m_databaseManager.getPlaylistMusicDAO()
-            ->getMusicForPlaylist(id);
-    m_musicModel->setMusic(id, music);
-    m_databaseManager.getSettingsDAO()->storeValue("current_playlist", id);
+            ->getMusicForPlaylist(playlist.id);
+    m_musicModel->setMusic(playlist.id, music);
+    m_databaseManager.getSettingsDAO()->storeValue("current_playlist",
+                                                   playlist.id);
+    m_currentPlaylistName = playlist.name;
+    emit currentPlaylistNameChanged();
 }
 
 void DataModel::addPlaylist(QString name)
 {
     int id = m_databaseManager.getPlaylistDAO()->createPlaylist(name);
-    m_playlistModel->addPlaylist({ id, name });
+    m_playlistModel->addPlaylist(Playlist{ id, name, 0 });
 }
 
 void DataModel::editPlaylist(int index, QString name)

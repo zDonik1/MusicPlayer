@@ -6,9 +6,14 @@ MusicModel::MusicModel()
 {
 }
 
-int MusicModel::getCurrentPlaylist()
+int MusicModel::getCurrentPlaylist() const
 {
     return m_currentPlaylist;
+}
+
+Music MusicModel::getMusic(const QModelIndex &index) const
+{
+    return m_music.at(index.row());
 }
 
 void MusicModel::setMusic(int playlistId, const std::vector<Music> &music)
