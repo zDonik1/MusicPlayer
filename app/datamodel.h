@@ -28,7 +28,7 @@ class DataModel : public QObject
 
 public:
     explicit DataModel(DatabaseManager &databaseManager,
-                       const QAndroidBinder &binder, QObject *parent = nullptr);
+                       QObject *parent = nullptr);
 
     DirModel *getDirModel();
     RootDirModel *getRootDirModel();
@@ -36,6 +36,8 @@ public:
     MusicModel *getMusicModel();
 
     const QString &getCurrentPlaylistName() const;
+
+    void setClientBinder(const QAndroidBinder &clientBinder);
 
 public slots:
     void play();
@@ -72,7 +74,7 @@ signals:
 
 private:
     DatabaseManager &m_databaseManager;
-    const QAndroidBinder &m_binder;
+    QAndroidBinder m_clientBinder;
 
     std::unique_ptr<DirModel> m_dirModel;
     std::unique_ptr<RootDirModel> m_rootDirModel;

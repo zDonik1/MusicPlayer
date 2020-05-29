@@ -3,11 +3,16 @@
 #include <QDebug>
 #include <QAndroidParcel>
 
+#include <messagetype.h>
+
 bool AppBinder::onTransact(int code, const QAndroidParcel &data,
                           const QAndroidParcel &reply,
                           QAndroidBinder::CallType flags)
 {
-    qDebug() << "~~~  client: onTransact " << code << data.readVariant() << int(flags);
-    reply.writeData("Yupee");
+    switch (code) {
+    case MessageType::DEBUG: {
+        qDebug() << "Player:" << data.readVariant().toString();
+    }
+    }
     return true;
 }

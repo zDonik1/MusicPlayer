@@ -2,7 +2,9 @@
 
 enum MessageType
 {
-    PLAY = 0,
+    BINDER = 1,
+    DEBUG,
+    PLAY,
     NEXT,
     PREVIOUS,
     SEEK,

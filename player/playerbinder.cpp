@@ -6,12 +6,24 @@
 
 #include <messagetype.h>
 
+#include "player.h"
+
+PlayerBinder::PlayerBinder(Player &player)
+    : m_player(player)
+{
+}
+
 bool PlayerBinder::onTransact(int code, const QAndroidParcel &data,
                               const QAndroidParcel &reply,
                               QAndroidBinder::CallType flags)
 {
-    qDebug() << "~~~  onTransact" << code << int(flags);
+    qDebug() << "~~~ onTransact" << code << int(flags);
     switch (code) {
+    case MessageType::BINDER: {
+        m_player.setServerBinder(data.readBinder());
+        reply.writeBinder(*(new PlayerBinder(m_player)));
+    }
+
     case MessageType::PLAY: {
         break;
     }
@@ -37,6 +49,8 @@ bool PlayerBinder::onTransact(int code, const QAndroidParcel &data,
     }
 
     case MessageType::MUSIC_CHANGED: {
+        m_player.changeMusic(data.readVariant().toUrl());
+        m_player.play();
         break;
     }
     }

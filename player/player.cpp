@@ -1,19 +1,34 @@
-#include <QDebug>
+#include "player.h"
 
-#include "playerservice.h"
+#include <QAndroidParcel>
 
-#include <QMediaPlayer>
+#include <messagetype.h>
 
-int main(int argc, char *argv[])
+Player::Player()
 {
-    qDebug() << "~~~ I'm alive !!!";
-    PlayerService app(argc, argv);
+    connect(&m_mediaPlayer, &QMediaPlayer::mediaStatusChanged,
+            this, &Player::onMediaStatusChanged);
+}
 
-    QMediaPlayer player;
-    player.setMedia(QUrl("qrc:/res/Generdyn - Destiny (ft. Krigare).mp3"));
-    player.setVolume(50);
-//    player.play();
-    qDebug() << "~~~ Started playing the best track";
+void Player::play()
+{
+    m_mediaPlayer.play();
+}
 
-    return app.exec();
+void Player::changeMusic(const QUrl &url)
+{
+    m_mediaPlayer.setMedia(url);
+}
+
+void Player::setServerBinder(const QAndroidBinder &serverBinder)
+{
+    m_serverBinder = serverBinder;
+}
+
+void Player::onMediaStatusChanged(QMediaPlayer::MediaStatus status)
+{
+    QAndroidParcel data;
+    data.writeVariant(QString("media status changed to "
+                              + QString::number(status)));
+    m_serverBinder.transact(MessageType::DEBUG, data);
 }

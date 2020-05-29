@@ -4,11 +4,13 @@ CONFIG += dll
 QT += core androidextras multimedia sql
 
 SOURCES += \
+    main.cpp \
     player.cpp \
     playerbinder.cpp \
     playerservice.cpp
 
 HEADERS += \
+    player.h \
     playerbinder.h \
     playerservice.h
 

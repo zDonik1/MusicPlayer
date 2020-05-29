@@ -26,8 +26,12 @@ int main(int argc, char *argv[])
                 QtAndroid::androidActivity().object());
     qDebug() << "~~~ ending call startService";
 
+    // Initializing DataModel
+    DatabaseManager databaseManager;
+    DataModel dataModel(databaseManager);
+
     // Connecting to service
-    AppConnection connection;
+    AppConnection connection(dataModel);
     qDebug() << "~~~  try to bind service";
     if (QtAndroid::bindService(
                     QAndroidIntent(QtAndroid::androidActivity(),
@@ -37,9 +41,6 @@ int main(int argc, char *argv[])
         qDebug() << "~~~  binding success";
     }
 
-    // Initializing DataModel
-    DatabaseManager databaseManager;
-    DataModel dataModel(databaseManager, connection.getServerBinder());
 
     // Initializing felgo application
     QApplication app(argc, argv);

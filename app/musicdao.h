@@ -18,6 +18,7 @@ public:
     static QString tableName();
 
     const std::vector<Music> &getAll();
+    const Music &getMusic(int id);
     int findByPath(const QUrl &path) const;
     int createMusic(const QUrl &path);
     void updateMusic(const Music &music);

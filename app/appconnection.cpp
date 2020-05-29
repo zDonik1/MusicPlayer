@@ -3,29 +3,22 @@
 #include <QDebug>
 #include <QAndroidParcel>
 
-void AppConnection::onServiceConnected(const QString &name, const QAndroidBinder &serviceBinder)
+#include <messagetype.h>
+#include "datamodel.h"
+
+AppConnection::AppConnection(DataModel &dataModel)
+    : m_dataModel(dataModel)
+{
+}
+
+void AppConnection::onServiceConnected(const QString &name,
+                                       const QAndroidBinder &serviceBinder)
 {
     qDebug() << "~~~  onServiceConnected" << name;
-
-    {
-        // test binder
-        QAndroidParcel sendData, replyData;
-        sendData.writeBinder(m_binder);
-        serviceBinder.transact(1, sendData, &replyData);
-        qDebug() << replyData.readVariant();
-    }
-
-    {
-
-    }
-
-    {
-        // test any data
-        QAndroidParcel sendData, replyData;
-        sendData.writeData("Here goes any data we like");
-        serviceBinder.transact(4, sendData, &replyData);
-        qDebug() << replyData.readVariant();
-    }
+    QAndroidParcel data, reply;
+    data.writeBinder(m_serverBinder);
+    serviceBinder.transact(MessageType::BINDER, data, &reply);
+    m_dataModel.setClientBinder(reply.readBinder());
 }
 
 void AppConnection::onServiceDisconnected(const QString &name)
@@ -35,5 +28,5 @@ void AppConnection::onServiceDisconnected(const QString &name)
 
 const QAndroidBinder &AppConnection::getServerBinder()
 {
-    return m_binder;
+    return m_serverBinder;
 }

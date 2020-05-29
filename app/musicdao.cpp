@@ -55,6 +55,15 @@ const std::vector<Music> &MusicDAO::getAll()
     return m_music;
 }
 
+const Music &MusicDAO::getMusic(int id)
+{
+    return *std::find_if(m_music.cbegin(), m_music.cend(),
+                        [&id] (const Music &music)
+    {
+        return music.id == id;
+    });
+}
+
 int MusicDAO::findByPath(const QUrl &path) const
 {
     return std::find_if(m_music.cbegin(), m_music.cend(),

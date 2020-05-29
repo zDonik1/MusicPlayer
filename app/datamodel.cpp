@@ -18,11 +18,9 @@
 #include "settingsdao.h"
 #include "musicaddworker.h"
 
-DataModel::DataModel(DatabaseManager &databaseManager,
-                     const QAndroidBinder &binder, QObject *parent)
+DataModel::DataModel(DatabaseManager &databaseManager, QObject *parent)
     : QObject(parent)
     , m_databaseManager(databaseManager)
-    , m_binder(binder)
     , m_dirModel(new DirModel)
     , m_rootDirModel(new RootDirModel)
     , m_playlistModel(new PlaylistModel)
@@ -84,48 +82,54 @@ const QString &DataModel::getCurrentPlaylistName() const
     return m_currentPlaylistName;
 }
 
+void DataModel::setClientBinder(const QAndroidBinder &clientBinder)
+{
+    m_clientBinder = clientBinder;
+}
+
 void DataModel::play()
 {
     QAndroidParcel sendData, replyData;
-    m_binder.transact(MessageType::PLAY, sendData, &replyData);
+    m_clientBinder.transact(MessageType::PLAY, sendData, &replyData);
 }
 
 void DataModel::next()
 {
     QAndroidParcel sendData, replyData;
-    m_binder.transact(MessageType::NEXT, sendData, &replyData);
+    m_clientBinder.transact(MessageType::NEXT, sendData, &replyData);
 }
 
 void DataModel::previous()
 {
     QAndroidParcel sendData, replyData;
-    m_binder.transact(MessageType::PREVIOUS, sendData, &replyData);
+    m_clientBinder.transact(MessageType::PREVIOUS, sendData, &replyData);
 }
 
 void DataModel::seek(double position)
 {
     QAndroidParcel sendData, replyData;
     sendData.writeVariant(position);
-    m_binder.transact(MessageType::SEEK, sendData, &replyData);
+    m_clientBinder.transact(MessageType::SEEK, sendData, &replyData);
 }
 
 void DataModel::shuffle()
 {
     QAndroidParcel sendData, replyData;
-    m_binder.transact(MessageType::SHUFFLE, sendData, &replyData);
+    m_clientBinder.transact(MessageType::SHUFFLE, sendData, &replyData);
 }
 
 void DataModel::repeat()
 {
     QAndroidParcel sendData, replyData;
-    m_binder.transact(MessageType::REPEAT, sendData, &replyData);
+    m_clientBinder.transact(MessageType::REPEAT, sendData, &replyData);
 }
 
 void DataModel::changeMusic(int index)
 {
-    QAndroidParcel sendData, replyData;
-    sendData.writeVariant(index);
-    m_binder.transact(MessageType::SEEK, sendData, &replyData);
+    QAndroidParcel data;
+    QUrl musicPath = m_musicModel->getMusic(m_musicModel->index(index)).path;
+    data.writeVariant(QUrl::fromLocalFile(musicPath.toString()));
+    m_clientBinder.transact(MessageType::MUSIC_CHANGED, data);
 }
 
 void DataModel::selectPlaylist(int index)
@@ -212,6 +216,14 @@ void DataModel::addDirToPlaylist(int dirIndex, int playlistIndex)
     connect(worker, &MusicAddWorker::finished, worker, &QThread::deleteLater);
     connect(thread, &QThread::finished, thread, &QThread::deleteLater);
     thread->start();
+
+    int playlistId = m_playlistModel->getPlaylist(m_playlistModel
+                                                  ->index(playlistIndex)).id;
+    if (playlistId == m_musicModel->getCurrentPlaylist()) {
+        auto music = m_databaseManager.getPlaylistMusicDAO()
+                ->getMusicForPlaylist(playlistId);
+        m_musicModel->setMusic(playlistId, music);
+    }
 }
 
 void DataModel::addMusicToPlaylist(int musicIndex, int playlistIndex)
@@ -222,6 +234,10 @@ void DataModel::addMusicToPlaylist(int musicIndex, int playlistIndex)
     int musicId = m_databaseManager.getMusicDAO()->createMusic(file);
     m_databaseManager.getPlaylistMusicDAO()
             ->addMusicToPlaylist(musicId, playlistId);
+
+    if (playlistId == m_musicModel->getCurrentPlaylist()) {
+        m_musicModel->addMusic(Music{ musicId, file });
+    }
 }
 
 void DataModel::deleteMusicFromMemory(int index)
