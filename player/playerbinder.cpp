@@ -25,6 +25,7 @@ bool PlayerBinder::onTransact(int code, const QAndroidParcel &data,
     }
 
     case MessageType::PLAY: {
+        m_player.playOrPause();
         break;
     }
 
@@ -50,7 +51,7 @@ bool PlayerBinder::onTransact(int code, const QAndroidParcel &data,
 
     case MessageType::MUSIC_CHANGED: {
         m_player.changeMusic(data.readVariant().toUrl());
-        m_player.play();
+        m_player.playOrPause();
         break;
     }
     }

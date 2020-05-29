@@ -10,7 +10,7 @@ class Player : public QObject
 public:
     Player();
 
-    void play();
+    void playOrPause();
     void changeMusic(const QUrl &url);
 
     void setServerBinder(const QAndroidBinder &serverBinder);

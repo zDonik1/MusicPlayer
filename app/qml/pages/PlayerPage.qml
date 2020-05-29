@@ -91,7 +91,7 @@ Page {
             }
 
             AppButton {
-                icon: IconType.play
+                icon: dataModel.isPlaying ? IconType.pause : IconType.play
                 flat: true
                 minimumWidth: root.width / 5
 

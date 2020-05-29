@@ -25,6 +25,7 @@ class DataModel : public QObject
 
     Q_PROPERTY(QString currentPlaylistName READ getCurrentPlaylistName
                NOTIFY currentPlaylistNameChanged)
+    Q_PROPERTY(bool isPlaying READ isPlaying NOTIFY isPlayingChanged)
 
 public:
     explicit DataModel(DatabaseManager &databaseManager,
@@ -36,6 +37,7 @@ public:
     MusicModel *getMusicModel();
 
     const QString &getCurrentPlaylistName() const;
+    bool isPlaying() const;
 
     void setClientBinder(const QAndroidBinder &clientBinder);
 
@@ -71,6 +73,7 @@ signals:
     void musicModelChanged();
 
     void currentPlaylistNameChanged();
+    void isPlayingChanged();
 
 private:
     DatabaseManager &m_databaseManager;
@@ -82,4 +85,5 @@ private:
     std::unique_ptr<MusicModel> m_musicModel;
 
     QString m_currentPlaylistName;
+    bool m_isPlaying = false;
 };

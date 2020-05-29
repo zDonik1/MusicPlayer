@@ -54,6 +54,10 @@ DataModel::DataModel(DatabaseManager &databaseManager, QObject *parent)
         auto music = m_databaseManager.getPlaylistMusicDAO()
                 ->getMusicForPlaylist(value.toInt());
         m_musicModel->setMusic(value.toInt(), music);
+        auto playlist = m_databaseManager.getPlaylistDAO()
+                ->getPlaylist(value.toInt());
+        m_currentPlaylistName = playlist.name;
+        emit currentPlaylistNameChanged();
     }
 }
 
@@ -82,6 +86,11 @@ const QString &DataModel::getCurrentPlaylistName() const
     return m_currentPlaylistName;
 }
 
+bool DataModel::isPlaying() const
+{
+    return m_isPlaying;
+}
+
 void DataModel::setClientBinder(const QAndroidBinder &clientBinder)
 {
     m_clientBinder = clientBinder;
@@ -89,47 +98,56 @@ void DataModel::setClientBinder(const QAndroidBinder &clientBinder)
 
 void DataModel::play()
 {
-    QAndroidParcel sendData, replyData;
-    m_clientBinder.transact(MessageType::PLAY, sendData, &replyData);
+    if (m_musicModel->getCurrentMusic() == -1)
+        return;
+
+    QAndroidParcel sendData;
+    m_clientBinder.transact(MessageType::PLAY, sendData);
+    m_isPlaying = !m_isPlaying;
+    emit isPlayingChanged();
 }
 
 void DataModel::next()
 {
-    QAndroidParcel sendData, replyData;
-    m_clientBinder.transact(MessageType::NEXT, sendData, &replyData);
+    QAndroidParcel sendData;
+    m_clientBinder.transact(MessageType::NEXT, sendData);
 }
 
 void DataModel::previous()
 {
-    QAndroidParcel sendData, replyData;
-    m_clientBinder.transact(MessageType::PREVIOUS, sendData, &replyData);
+    QAndroidParcel sendData;
+    m_clientBinder.transact(MessageType::PREVIOUS, sendData);
 }
 
 void DataModel::seek(double position)
 {
-    QAndroidParcel sendData, replyData;
+    QAndroidParcel sendData;
     sendData.writeVariant(position);
-    m_clientBinder.transact(MessageType::SEEK, sendData, &replyData);
+    m_clientBinder.transact(MessageType::SEEK, sendData);
 }
 
 void DataModel::shuffle()
 {
-    QAndroidParcel sendData, replyData;
-    m_clientBinder.transact(MessageType::SHUFFLE, sendData, &replyData);
+    QAndroidParcel sendData;
+    m_clientBinder.transact(MessageType::SHUFFLE, sendData);
 }
 
 void DataModel::repeat()
 {
-    QAndroidParcel sendData, replyData;
-    m_clientBinder.transact(MessageType::REPEAT, sendData, &replyData);
+    QAndroidParcel sendData;
+    m_clientBinder.transact(MessageType::REPEAT, sendData);
 }
 
 void DataModel::changeMusic(int index)
 {
+    auto music = m_musicModel->getMusic(m_musicModel->index(index));
     QAndroidParcel data;
-    QUrl musicPath = m_musicModel->getMusic(m_musicModel->index(index)).path;
-    data.writeVariant(QUrl::fromLocalFile(musicPath.toString()));
+    data.writeVariant(QUrl::fromLocalFile(music.path.toString()));
     m_clientBinder.transact(MessageType::MUSIC_CHANGED, data);
+
+    m_musicModel->setCurrentMusic(music.id);
+    m_isPlaying = true;
+    emit isPlayingChanged();
 }
 
 void DataModel::selectPlaylist(int index)

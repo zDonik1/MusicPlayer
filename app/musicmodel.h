@@ -22,8 +22,10 @@ public:
     MusicModel();
 
     int getCurrentPlaylist() const;
+    int getCurrentMusic() const;
     Music getMusic(const QModelIndex &index) const;
 
+    void setCurrentMusic(int currentMusic);
     void setMusic(int playlistId, const std::vector<Music> &music);
     void addMusic(const Music &music);
     void deleteMusic(const QModelIndex &index);
@@ -39,4 +41,5 @@ signals:
 private:
     std::vector<Music> m_music;
     int m_currentPlaylist = -1;
+    int m_currentMusic = -1;
 };

@@ -10,9 +10,12 @@ Player::Player()
             this, &Player::onMediaStatusChanged);
 }
 
-void Player::play()
+void Player::playOrPause()
 {
-    m_mediaPlayer.play();
+    if (m_mediaPlayer.state() == QMediaPlayer::PlayingState)
+        m_mediaPlayer.pause();
+    else
+        m_mediaPlayer.play();
 }
 
 void Player::changeMusic(const QUrl &url)
