@@ -21,6 +21,11 @@ Music MusicModel::getMusic(const QModelIndex &index) const
     return m_music.at(index.row());
 }
 
+const std::vector<Music> &MusicModel::getAllMusic() const
+{
+    return m_music;
+}
+
 void MusicModel::setCurrentMusic(int currentMusic)
 {
     m_currentMusic = currentMusic;

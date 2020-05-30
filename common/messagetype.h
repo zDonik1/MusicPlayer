@@ -4,6 +4,7 @@ enum MessageType
 {
     BINDER = 1,
     DEBUG,
+    LOAD_PLAYLIST,
     PLAY,
     NEXT,
     PREVIOUS,

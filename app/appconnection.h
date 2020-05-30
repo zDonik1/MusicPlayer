@@ -19,6 +19,5 @@ public:
 
 private:
     AppBinder m_serverBinder;
-
     DataModel &m_dataModel;
 };

@@ -40,6 +40,10 @@ void SettingsDAO::init()
         case QMetaType::QString:
             variant = query.value(1);
             break;
+
+        case QMetaType::Bool:
+            variant = static_cast<bool>(query.value(1).toString().toInt());
+            break;
         }
         m_map[query.value(0).toString()] = variant;
     }
@@ -76,6 +80,11 @@ bool SettingsDAO::storeValue(const QString &key, const QString &value)
 bool SettingsDAO::storeValue(const QString &key, int value)
 {
     return storeValue(key, QString::number(value), QMetaType::Int);
+}
+
+bool SettingsDAO::storeValue(const QString &key, bool value)
+{
+    return storeValue(key, QString::number(value ? 1 : 0), QMetaType::Bool);
 }
 
 bool SettingsDAO::storeValue(const QString &key, const QString &value,

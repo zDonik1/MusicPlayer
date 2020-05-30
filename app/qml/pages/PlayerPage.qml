@@ -77,7 +77,8 @@ Page {
                 icon: IconType.random
                 flat: true
                 minimumWidth: root.width / 5
-                textColor: Theme.disabledColor
+                textColor: dataModel.isShuffle ? Theme.tintColor
+                                             : Theme.disabledColor
 
                 onClicked: logic.shuffle()
             }
@@ -110,7 +111,8 @@ Page {
                 icon: IconType.undo
                 flat: true
                 minimumWidth: root.width / 5
-                textColor: Theme.disabledColor
+                textColor: dataModel.isRepeat ? Theme.tintColor
+                                            : Theme.disabledColor
 
                 onClicked: logic.repeat()
             }

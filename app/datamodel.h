@@ -26,10 +26,14 @@ class DataModel : public QObject
     Q_PROPERTY(QString currentPlaylistName READ getCurrentPlaylistName
                NOTIFY currentPlaylistNameChanged)
     Q_PROPERTY(bool isPlaying READ isPlaying NOTIFY isPlayingChanged)
+    Q_PROPERTY(bool isShuffle READ getShuffle NOTIFY shuffleChanged)
+    Q_PROPERTY(bool isRepeat READ getRepeat NOTIFY repeatChanged)
 
 public:
     explicit DataModel(DatabaseManager &databaseManager,
                        QObject *parent = nullptr);
+
+    const QAndroidBinder &getClientBinder() const;
 
     DirModel *getDirModel();
     RootDirModel *getRootDirModel();
@@ -38,6 +42,8 @@ public:
 
     const QString &getCurrentPlaylistName() const;
     bool isPlaying() const;
+    bool getShuffle() const;
+    bool getRepeat() const;
 
     void setClientBinder(const QAndroidBinder &clientBinder);
 
@@ -74,6 +80,11 @@ signals:
 
     void currentPlaylistNameChanged();
     void isPlayingChanged();
+    void shuffleChanged();
+    void repeatChanged();
+
+private:
+    void setupPlayerToPlaylist(int id);
 
 private:
     DatabaseManager &m_databaseManager;
@@ -86,4 +97,6 @@ private:
 
     QString m_currentPlaylistName;
     bool m_isPlaying = false;
+    bool m_shuffle = false;
+    bool m_repeat = false;
 };

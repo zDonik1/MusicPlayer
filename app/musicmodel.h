@@ -24,6 +24,7 @@ public:
     int getCurrentPlaylist() const;
     int getCurrentMusic() const;
     Music getMusic(const QModelIndex &index) const;
+    const std::vector<Music> &getAllMusic() const;
 
     void setCurrentMusic(int currentMusic);
     void setMusic(int playlistId, const std::vector<Music> &music);

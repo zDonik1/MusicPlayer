@@ -24,16 +24,22 @@ bool PlayerBinder::onTransact(int code, const QAndroidParcel &data,
         reply.writeBinder(*(new PlayerBinder(m_player)));
     }
 
+    case MessageType::LOAD_PLAYLIST: {
+        m_player.setPlaylist(data.readVariant().toList());
+    }
+
     case MessageType::PLAY: {
-        m_player.playOrPause();
+        m_player.setPlay(data.readVariant().toBool());
         break;
     }
 
     case MessageType::NEXT: {
+        m_player.next();
         break;
     }
 
     case MessageType::PREVIOUS: {
+        m_player.previous();
         break;
     }
 
@@ -42,16 +48,18 @@ bool PlayerBinder::onTransact(int code, const QAndroidParcel &data,
     }
 
     case MessageType::SHUFFLE: {
+        m_player.setShuffle(data.readVariant().toBool());
         break;
     }
 
     case MessageType::REPEAT: {
+        m_player.setRepeat(data.readVariant().toBool());
         break;
     }
 
     case MessageType::MUSIC_CHANGED: {
-        m_player.changeMusic(data.readVariant().toUrl());
-        m_player.playOrPause();
+        m_player.changeMusic(data.readVariant().toInt());
+        m_player.setPlay(true);
         break;
     }
     }
