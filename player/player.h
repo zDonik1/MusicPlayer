@@ -23,6 +23,7 @@ public:
 
 public slots:
     void onMediaStatusChanged(QMediaPlayer::MediaStatus status);
+    void onCurrentIndexChanged(int index);
 
 private:
     void checkShuffleRepeat();
@@ -34,4 +35,6 @@ private:
 
     bool m_shuffle = false;
     bool m_repeat = false;
+
+    int m_nextIndex = -1;
 };

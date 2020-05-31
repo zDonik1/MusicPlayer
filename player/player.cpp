@@ -8,6 +8,8 @@ Player::Player()
 {
     connect(&m_mediaPlayer, &QMediaPlayer::mediaStatusChanged,
             this, &Player::onMediaStatusChanged);
+    connect(&m_playlist, &QMediaPlaylist::currentIndexChanged,
+            this, &Player::onCurrentIndexChanged);
 
     m_mediaPlayer.setPlaylist(&m_playlist);
 }
@@ -66,6 +68,15 @@ void Player::onMediaStatusChanged(QMediaPlayer::MediaStatus status)
     data.writeVariant(QString("media status changed to "
                               + QString::number(status)));
     m_serverBinder.transact(MessageType::DEBUG, data);
+}
+
+void Player::onCurrentIndexChanged(int index)
+{
+    if (m_playlist.playbackMode() == QMediaPlaylist::Random)
+        if (index == m_nextIndex)
+            m_playlist.next();
+
+    m_nextIndex = m_playlist.nextIndex();
 }
 
 void Player::checkShuffleRepeat()
