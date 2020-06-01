@@ -18,6 +18,9 @@ public:
     const QAndroidBinder &getServerBinder();
 
 private:
+    void initializePlayerService();
+
+private:
     DataModel &m_dataModel;
     AppBinder m_serverBinder;
 };

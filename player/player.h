@@ -30,6 +30,7 @@ public slots:
 
 private:
     void checkShuffleRepeat();
+    void debug(const QString &message); // helper function for debugging service
 
 private:
     QMediaPlaylist m_playlist;

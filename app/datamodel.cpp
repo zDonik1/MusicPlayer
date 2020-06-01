@@ -165,7 +165,6 @@ void DataModel::shuffle()
     data.writeVariant(m_shuffle);
     m_clientBinder.transact(MessageType::SHUFFLE, data);
     m_databaseManager.getSettingsDAO()->storeValue("shuffle", m_shuffle);
-    qDebug() << "shuffle changed to:" << m_shuffle;
 }
 
 void DataModel::repeat()
@@ -176,7 +175,6 @@ void DataModel::repeat()
     data.writeVariant(m_repeat);
     m_clientBinder.transact(MessageType::REPEAT, data);
     m_databaseManager.getSettingsDAO()->storeValue("repeat", m_repeat);
-    qDebug() << "repeat changed to:" << m_repeat;
 }
 
 void DataModel::changeMusic(int index)
@@ -381,15 +379,8 @@ void DataModel::initializePlayer()
     m_shuffle = m_databaseManager.getSettingsDAO()
             ->getValue("shuffle").toBool();
     emit shuffleChanged();
-    QAndroidParcel shuffleData;
-    shuffleData.writeVariant(m_shuffle);
-    m_clientBinder.transact(MessageType::SHUFFLE, shuffleData);
-
     m_repeat = m_databaseManager.getSettingsDAO()->getValue("repeat").toBool();
     emit repeatChanged();
-    QAndroidParcel repeatData;
-    repeatData.writeVariant(m_repeat);
-    m_clientBinder.transact(MessageType::REPEAT, repeatData);
 }
 
 void DataModel::setupPlayerToPlaylist(int id)

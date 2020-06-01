@@ -102,8 +102,15 @@ void Player::checkShuffleRepeat()
         return;
     }
 
-    if (!m_shuffle)
-        m_playlist.setPlaybackMode(QMediaPlaylist::Loop);
-    else
+    if (m_shuffle)
         m_playlist.setPlaybackMode(QMediaPlaylist::Random);
+    else
+        m_playlist.setPlaybackMode(QMediaPlaylist::Loop);
+}
+
+void Player::debug(const QString &message)
+{
+    QAndroidParcel data;
+    data.writeVariant(message);
+    m_serverBinder.transact(MessageType::DEBUG, data);
 }
