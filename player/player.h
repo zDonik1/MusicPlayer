@@ -25,11 +25,10 @@ public:
 
 public slots:
     void onCurrentIndexChanged(int index);
-    void onPositionTimerTimeout();
     void onPlayerStateChanged(QMediaPlayer::State state);
+    void onPositionTimerTimeout();
 
 private:
-    void checkShuffleRepeat();
     void debug(const QString &message); // helper function for debugging service
 
 private:
@@ -41,5 +40,5 @@ private:
     bool m_shuffle = false;
     bool m_repeat = false;
 
-    int m_nextIndex = -1;
+    bool m_doneChangingIndex = false;
 };

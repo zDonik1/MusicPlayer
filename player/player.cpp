@@ -1,6 +1,7 @@
 #include "player.h"
 
 #include <QAndroidParcel>
+#include <QRandomGenerator>
 
 #include <messagetype.h>
 
@@ -52,13 +53,15 @@ void Player::seek(int64_t position)
 void Player::setShuffle(bool shuffle)
 {
     m_shuffle = shuffle;
-    checkShuffleRepeat();
 }
 
 void Player::setRepeat(bool repeat)
 {
     m_repeat = repeat;
-    checkShuffleRepeat();
+    if (m_repeat)
+        m_playlist.setPlaybackMode(QMediaPlaylist::CurrentItemInLoop);
+    else
+        m_playlist.setPlaybackMode(QMediaPlaylist::Loop);
 }
 
 void Player::changeMusic(int index)
@@ -71,20 +74,22 @@ void Player::setServerBinder(const QAndroidBinder &serverBinder)
     m_serverBinder = serverBinder;
 }
 
-void Player::onCurrentIndexChanged(int index)
+void Player::onCurrentIndexChanged(int /*index*/)
 {
-    if (m_playlist.playbackMode() == QMediaPlaylist::Random)
-        if (index == m_nextIndex)
-            m_playlist.next();
+    if (!m_shuffle)
+        return;
 
-    m_nextIndex = m_playlist.nextIndex();
-}
+    if (m_doneChangingIndex)
+        return;
 
-void Player::onPositionTimerTimeout()
-{
-    QAndroidParcel data;
-    data.writeVariant(m_mediaPlayer.position());
-    m_serverBinder.transact(MessageType::POSITION_CHANGED, data);
+    int generatedIndex = m_playlist.previousIndex();
+    while (generatedIndex == m_playlist.previousIndex()) {
+        generatedIndex = QRandomGenerator::global()->generate()
+                % m_playlist.mediaCount();
+    }
+    m_doneChangingIndex = true;
+    m_playlist.setCurrentIndex(generatedIndex);
+    m_doneChangingIndex = false;
 }
 
 void Player::onPlayerStateChanged(QMediaPlayer::State state)
@@ -95,17 +100,11 @@ void Player::onPlayerStateChanged(QMediaPlayer::State state)
         m_positionTimer.stop();
 }
 
-void Player::checkShuffleRepeat()
+void Player::onPositionTimerTimeout()
 {
-    if (m_repeat) {
-        m_playlist.setPlaybackMode(QMediaPlaylist::CurrentItemInLoop);
-        return;
-    }
-
-    if (m_shuffle)
-        m_playlist.setPlaybackMode(QMediaPlaylist::Random);
-    else
-        m_playlist.setPlaybackMode(QMediaPlaylist::Loop);
+    QAndroidParcel data;
+    data.writeVariant(m_mediaPlayer.position());
+    m_serverBinder.transact(MessageType::POSITION_CHANGED, data);
 }
 
 void Player::debug(const QString &message)
