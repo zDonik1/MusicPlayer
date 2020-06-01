@@ -3,11 +3,18 @@ import QtGraphicalEffects 1.0
 import Felgo 3.0
 
 Item {
+    function reloadImage() {
+        let temp = image
+        image = ""
+        image = temp
+    }
+
     signal clicked()
 
     property alias backgroundColor: background.color
     property alias title: textTitle.text
     property alias duration: textDuration.text
+    property bool isDefaultImage: true
     property string image: ""
 
     id: root
@@ -38,17 +45,18 @@ Item {
                 id: imageMusic
 
                 anchors.centerIn: parent
-                height: image !== ""
-                        ? parent.height : dp(30)
+                height: isDefaultImage ? dp(30) : parent.height
                 width: height
                 fillMode: Image.PreserveAspectCrop
-                source: image !== "" ? image : "../../assets/audiotrack.png"
+                source: isDefaultImage ? "../../assets/audiotrack.png" : image
+                sourceSize: Qt.size(width, height)
                 visible: false
+                cache: false
             }
 
             ColorOverlay {
                 anchors.fill: imageMusic
-                color: image !== "" ? "transparent" : "white"
+                color: isDefaultImage ? "white" : "transparent"
                 source: imageMusic
             }
         }

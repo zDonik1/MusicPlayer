@@ -9,7 +9,7 @@
 #include <QStack>
 #include <QUrl>
 #include <QThread>
-#include <QVector>
+#include <QMediaPlayer>
 #include <QDebug>
 
 #include <messagetype.h>
@@ -35,6 +35,10 @@ DataModel::DataModel(DatabaseManager &databaseManager, QObject *parent)
     connect(m_databaseManager.getPlaylistMusicDAO(),
             &PlaylistMusicDAO::musicRemovedFromPlaylist,
             m_playlistModel.get(), &PlaylistModel::decrementMusicCount);
+    connect(&m_metaDataScanner, &MetaDataScanner::metaDataReady,
+            this, &DataModel::imagesReady);
+    connect(&m_metaDataScanner, &MetaDataScanner::metaDataReady,
+            this, &DataModel::onMetaDataReady);
 
     // setting up playlists
     auto playlists = m_databaseManager.getPlaylistDAO()->getAll();
@@ -59,6 +63,7 @@ DataModel::DataModel(DatabaseManager &databaseManager, QObject *parent)
         auto music = m_databaseManager.getPlaylistMusicDAO()
                 ->getMusicForPlaylist(playlist.id);
         m_musicModel->setMusic(playlist.id, music);
+        m_metaDataScanner.getMetaData(&m_musicModel->getAllMusic());
 
         m_currentPlaylistName = playlist.name;
         emit currentPlaylistNameChanged();
@@ -126,6 +131,11 @@ bool DataModel::getRepeat() const
 void DataModel::setClientBinder(const QAndroidBinder &clientBinder)
 {
     m_clientBinder = clientBinder;
+}
+
+void DataModel::setMusicImageProvider(MusicImageProvider *imageProvider)
+{
+    m_imageProvider = imageProvider;
 }
 
 void DataModel::play()
@@ -197,6 +207,7 @@ void DataModel::selectPlaylist(int index)
     auto music = m_databaseManager.getPlaylistMusicDAO()
             ->getMusicForPlaylist(playlist.id);
     m_musicModel->setMusic(playlist.id, music);
+    m_metaDataScanner.getMetaData(&m_musicModel->getAllMusic());
 
     QVariantList musicVarList;
     for (auto &m : music)
@@ -336,6 +347,17 @@ void DataModel::dropTables()
     m_rootDirModel->setRootDirs({});
     m_playlistModel->setPlaylists({});
     m_musicModel->setMusic(-1, {});
+}
+
+void DataModel::onMetaDataReady()
+{
+    m_musicModel->updateModelMetaData();
+    auto &music = m_musicModel->getAllMusic();
+    std::vector<QPixmap> pixmaps;
+    for (auto &m : music) {
+        pixmaps.push_back(QPixmap::fromImage(m.metaData.image));
+    }
+    m_imageProvider->setMusicImages(std::move(pixmaps));
 }
 
 void DataModel::setupPlayerToPlaylist(int id)

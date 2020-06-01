@@ -45,11 +45,14 @@ int main(int argc, char *argv[])
     // Initializing felgo application
     QApplication app(argc, argv);
     FelgoApplication felgo;
-
     felgo.setPreservePlatformFonts(true);
+
+    auto imageProvider = new MusicImageProvider;
+    dataModel.setMusicImageProvider(imageProvider);
 
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty("dataModel", &dataModel);
+    engine.addImageProvider("musicImage", imageProvider);
     felgo.initialize(&engine);
 
     felgo.setLicenseKey(PRODUCT_LICENSE_KEY);

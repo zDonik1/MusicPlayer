@@ -33,7 +33,7 @@ int RootDirModel::deleteRootDir(const QModelIndex &index)
     return id;
 }
 
-int RootDirModel::rowCount(const QModelIndex &parent) const
+int RootDirModel::rowCount(const QModelIndex &/*parent*/) const
 {
     return m_rootDirs.size();
 }
@@ -47,7 +47,6 @@ QVariant RootDirModel::data(const QModelIndex &index, int role) const
     case Qt::DisplayRole:
     case Roles::PathRole:
         return m_rootDirs.at(index.row()).dir.path();
-        break;
     }
 
     return QVariant();

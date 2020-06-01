@@ -55,12 +55,10 @@ QVariant PlaylistModel::data(const QModelIndex &index, int role) const
     switch (role) {
     case Roles::MusicCountRole:
         return m_playlists.at(index.row()).musicCount;
-        break;
 
     case Qt::DisplayRole:
     case Roles::NameRole:
         return m_playlists.at(index.row()).name;
-        break;
     }
 
     return QVariant();

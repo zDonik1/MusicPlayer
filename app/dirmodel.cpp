@@ -102,7 +102,6 @@ QVariant DirModel::data(const QModelIndex &index, int role) const
             return QDir(filename).dirName();
         else
             return filename;
-        break;
     }
 
     default:

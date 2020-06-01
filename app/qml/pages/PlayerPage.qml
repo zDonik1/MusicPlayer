@@ -4,6 +4,13 @@ import Felgo 3.0
 import "../components"
 
 Page {
+    function timeToText(time) {
+        let seconds = time / 1000
+        let minutes = Math.floor(seconds / 60)
+        seconds = Math.floor(seconds % 60)
+        return minutes + ":" + (seconds < 10 ? "0" : "") + seconds
+    }
+
     id: root
     title: dataModel.currentPlaylistName === ""
            ? qsTr("Music Player")
@@ -26,12 +33,24 @@ Page {
                              ? Theme.listItem.selectedBackgroundColor
                              : Theme.backgroundColor
             title: r_title
-            duration: ""
-            image: ""
+            duration: timeToText(r_duration)
+            image: "image://musicImage/" + index
+            isDefaultImage: r_isDefaultImage
 
             onClicked: {
                 listView.selected = index
                 logic.musicChanged(index)
+            }
+        }
+    }
+
+    Connections {
+        target: dataModel
+
+        onImagesReady: {
+            let iMax = listView.count
+            for (let i = 0; i < iMax; ++i) {
+                listView.itemAtIndex(i).reloadImage()
             }
         }
     }

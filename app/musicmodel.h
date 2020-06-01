@@ -15,7 +15,9 @@ class MusicModel : public QAbstractListModel
 public:
     enum Roles
     {
-        TitleRole = Qt::UserRole
+        TitleRole = Qt::UserRole,
+        DurationRole,
+        IsDefaultImageRole
     };
 
 public:
@@ -25,6 +27,7 @@ public:
     int getCurrentMusic() const;
     Music getMusic(const QModelIndex &index) const;
     const std::vector<Music> &getAllMusic() const;
+    std::vector<Music> &getAllMusic();
 
     void setCurrentMusic(int currentMusic);
     void setMusic(int playlistId, const std::vector<Music> &music);
@@ -35,6 +38,9 @@ public:
     QVariant data(const QModelIndex &index,
                   int role = Qt::DisplayRole) const override;
     QHash<int, QByteArray> roleNames() const override;
+
+public slots:
+    void updateModelMetaData();
 
 signals:
     void currentPlaylistChanged();

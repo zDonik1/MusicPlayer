@@ -46,8 +46,10 @@ SOURCES += main.cpp \
     databasemanager.cpp \
     datamodel.cpp \
     dirmodel.cpp \
+    metadatascanner.cpp \
     musicaddworker.cpp \
     musicdao.cpp \
+    musicimageprovider.cpp \
     musicmodel.cpp \
     playlistdao.cpp \
     playlistmodel.cpp \
@@ -64,9 +66,11 @@ HEADERS += \
     datamodel.h \
     directory.h \
     dirmodel.h \
+    metadatascanner.h \
     music.h \
     musicaddworker.h \
     musicdao.h \
+    musicimageprovider.h \
     musicmodel.h \
     playlist.h \
     playlistdao.h \

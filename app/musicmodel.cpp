@@ -1,6 +1,7 @@
 #include "musicmodel.h"
 
 #include <QUrl>
+#include <QDebug>
 
 MusicModel::MusicModel()
 {
@@ -22,6 +23,11 @@ Music MusicModel::getMusic(const QModelIndex &index) const
 }
 
 const std::vector<Music> &MusicModel::getAllMusic() const
+{
+    return m_music;
+}
+
+std::vector<Music> &MusicModel::getAllMusic()
 {
     return m_music;
 }
@@ -71,8 +77,16 @@ QVariant MusicModel::data(const QModelIndex &index, int role) const
     switch (role) {
     case Qt::DisplayRole:
     case Roles::TitleRole:
-        return QUrl(m_music.at(index.row()).path).fileName();
-        break;
+        if (m_music.at(index.row()).metaData.title.isEmpty())
+            return QUrl(m_music.at(index.row()).path).fileName();
+        else
+            return m_music.at(index.row()).metaData.title;
+
+    case Roles::DurationRole:
+        return m_music.at(index.row()).metaData.duration;
+
+    case Roles::IsDefaultImageRole:
+        return m_music.at(index.row()).metaData.image.isNull();
     }
 
     return QVariant();
@@ -82,5 +96,13 @@ QHash<int, QByteArray> MusicModel::roleNames() const
 {
     QHash<int, QByteArray> roles;
     roles[Roles::TitleRole] = "r_title";
+    roles[Roles::DurationRole] = "r_duration";
+    roles[Roles::IsDefaultImageRole] = "r_isDefaultImage";
     return roles;
+}
+
+void MusicModel::updateModelMetaData()
+{
+    dataChanged(createIndex(0, 0), createIndex(m_music.size() - 1, 0),
+    { Roles::TitleRole, Roles::DurationRole, Roles::IsDefaultImageRole });
 }
