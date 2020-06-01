@@ -40,7 +40,6 @@ DataModel::DataModel(DatabaseManager &databaseManager, QObject *parent)
     connect(&m_metaDataScanner, &MetaDataScanner::metaDataReady,
             this, &DataModel::onMetaDataReady);
 
-    // setting up playlists
     auto playlists = m_databaseManager.getPlaylistDAO()->getAll();
     for (auto &playlist : playlists) {
         playlist.musicCount = m_databaseManager.getPlaylistMusicDAO()
@@ -48,39 +47,9 @@ DataModel::DataModel(DatabaseManager &databaseManager, QObject *parent)
     }
     m_playlistModel->setPlaylists(playlists);
 
-    // setting up rootdirs
     m_rootDirModel->setRootDirs(m_databaseManager.getRootDirDAO()->getAll());
 
-    // setting up player
-    QVariant value = m_databaseManager.getSettingsDAO()
-            ->getValue("current_playlist");
-    if (!value.isValid()) {
-        m_musicModel->setMusic(-1, {});
-    }
-    else {
-        auto playlist = m_databaseManager.getPlaylistDAO()
-                ->getPlaylist(value.toInt());
-        auto music = m_databaseManager.getPlaylistMusicDAO()
-                ->getMusicForPlaylist(playlist.id);
-        m_musicModel->setMusic(playlist.id, music);
-        m_metaDataScanner.getMetaData(&m_musicModel->getAllMusic());
-
-        m_currentPlaylistName = playlist.name;
-        emit currentPlaylistNameChanged();
-    }
-
-    m_shuffle = m_databaseManager.getSettingsDAO()
-            ->getValue("shuffle").toBool();
-    emit shuffleChanged();
-    QAndroidParcel shuffleData;
-    shuffleData.writeVariant(m_shuffle);
-    m_clientBinder.transact(MessageType::SHUFFLE, shuffleData);
-
-    m_repeat = m_databaseManager.getSettingsDAO()->getValue("repeat").toBool();
-    emit repeatChanged();
-    QAndroidParcel repeatData;
-    repeatData.writeVariant(m_repeat);
-    m_clientBinder.transact(MessageType::REPEAT, repeatData);
+    initializePlayer();
 }
 
 const QAndroidBinder &DataModel::getClientBinder() const
@@ -128,6 +97,16 @@ bool DataModel::getRepeat() const
     return m_repeat;
 }
 
+qint64 DataModel::getCurrentMusicDuration() const
+{
+    return m_currentMusicDuration;
+}
+
+qint64 DataModel::getCurrentMusicPosition() const
+{
+    return m_currentMusicPosition;
+}
+
 void DataModel::setClientBinder(const QAndroidBinder &clientBinder)
 {
     m_clientBinder = clientBinder;
@@ -138,9 +117,15 @@ void DataModel::setMusicImageProvider(MusicImageProvider *imageProvider)
     m_imageProvider = imageProvider;
 }
 
+void DataModel::setCurrentMusicPosition(int64_t position)
+{
+    m_currentMusicPosition = position;
+    emit currentMusicPositionChanged();
+}
+
 void DataModel::play()
 {
-    if (m_musicModel->getCurrentMusic() == -1)
+    if (m_musicModel->getCurrentMusicIndex() == -1)
         return;
 
     m_isPlaying = !m_isPlaying;
@@ -152,18 +137,23 @@ void DataModel::play()
 
 void DataModel::next()
 {
-    m_clientBinder.transact(MessageType::NEXT, QAndroidParcel());
+    QAndroidParcel reply;
+    m_clientBinder.transact(MessageType::NEXT, QAndroidParcel(), &reply);
+    updateOnMusicChanged(reply.readVariant().toInt());
 }
 
 void DataModel::previous()
 {
-    m_clientBinder.transact(MessageType::PREVIOUS, QAndroidParcel());
+    QAndroidParcel reply;
+    m_clientBinder.transact(MessageType::PREVIOUS, QAndroidParcel(), &reply);
+    updateOnMusicChanged(reply.readVariant().toInt());
 }
 
 void DataModel::seek(double position)
 {
+    m_currentMusicPosition = m_currentMusicDuration * position;
     QAndroidParcel sendData;
-    sendData.writeVariant(position);
+    sendData.writeVariant(static_cast<qint64>(m_currentMusicPosition));
     m_clientBinder.transact(MessageType::SEEK, sendData);
 }
 
@@ -195,8 +185,7 @@ void DataModel::changeMusic(int index)
     data.writeVariant(index);
     m_clientBinder.transact(MessageType::MUSIC_CHANGED, data);
 
-    auto music = m_musicModel->getMusic(m_musicModel->index(index));
-    m_musicModel->setCurrentMusic(music.id);
+    updateOnMusicChanged(index);
     m_isPlaying = true;
     emit isPlayingChanged();
 }
@@ -352,12 +341,55 @@ void DataModel::dropTables()
 void DataModel::onMetaDataReady()
 {
     m_musicModel->updateModelMetaData();
+    m_currentMusicDuration = m_musicModel->getCurrentMusic().metaData.duration;
+    emit currentMusicDurationChanged();
+
     auto &music = m_musicModel->getAllMusic();
     std::vector<QPixmap> pixmaps;
     for (auto &m : music) {
         pixmaps.push_back(QPixmap::fromImage(m.metaData.image));
     }
     m_imageProvider->setMusicImages(std::move(pixmaps));
+}
+
+void DataModel::initializePlayer()
+{
+    QVariant currentPlaylistVariant = m_databaseManager.getSettingsDAO()
+            ->getValue("current_playlist");
+    if (!currentPlaylistVariant.isValid()) {
+        m_musicModel->setMusic(-1, {});
+    }
+    else {
+        auto playlist = m_databaseManager.getPlaylistDAO()
+                ->getPlaylist(currentPlaylistVariant.toInt());
+        auto music = m_databaseManager.getPlaylistMusicDAO()
+                ->getMusicForPlaylist(playlist.id);
+        m_musicModel->setMusic(playlist.id, music);
+        m_metaDataScanner.getMetaData(&m_musicModel->getAllMusic());
+
+        m_currentPlaylistName = playlist.name;
+        emit currentPlaylistNameChanged();
+
+        QVariant currentMusicVariant = m_databaseManager.getSettingsDAO()
+                ->getValue("current_music_index");
+        if (currentMusicVariant.isValid())
+            updateOnMusicChanged(currentMusicVariant.toInt());
+        else
+            updateOnMusicChanged(-1);
+    }
+
+    m_shuffle = m_databaseManager.getSettingsDAO()
+            ->getValue("shuffle").toBool();
+    emit shuffleChanged();
+    QAndroidParcel shuffleData;
+    shuffleData.writeVariant(m_shuffle);
+    m_clientBinder.transact(MessageType::SHUFFLE, shuffleData);
+
+    m_repeat = m_databaseManager.getSettingsDAO()->getValue("repeat").toBool();
+    emit repeatChanged();
+    QAndroidParcel repeatData;
+    repeatData.writeVariant(m_repeat);
+    m_clientBinder.transact(MessageType::REPEAT, repeatData);
 }
 
 void DataModel::setupPlayerToPlaylist(int id)
@@ -372,4 +404,15 @@ void DataModel::setupPlayerToPlaylist(int id)
     QAndroidParcel data;
     data.writeVariant(musicVarList);
     m_clientBinder.transact(MessageType::LOAD_PLAYLIST, data);
+}
+
+void DataModel::updateOnMusicChanged(int index)
+{
+    m_musicModel->setCurrentMusicIndex(index);
+    m_currentMusicDuration = m_musicModel->getCurrentMusic().metaData.duration;
+    m_currentMusicPosition = 0;
+    emit currentMusicDurationChanged();
+    emit currentMusicPositionChanged();
+    m_databaseManager.getSettingsDAO()->storeValue("current_music_index",
+                                                   index);
 }

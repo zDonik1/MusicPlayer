@@ -34,16 +34,17 @@ bool PlayerBinder::onTransact(int code, const QAndroidParcel &data,
     }
 
     case MessageType::NEXT: {
-        m_player.next();
+        reply.writeVariant(m_player.next());
         break;
     }
 
     case MessageType::PREVIOUS: {
-        m_player.previous();
+        reply.writeVariant(m_player.previous());
         break;
     }
 
     case MessageType::SEEK: {
+        m_player.seek(data.readVariant().toLongLong());
         break;
     }
 

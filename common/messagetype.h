@@ -12,4 +12,5 @@ enum MessageType
     SHUFFLE,
     REPEAT,
     MUSIC_CHANGED,
+    POSITION_CHANGED,
 };

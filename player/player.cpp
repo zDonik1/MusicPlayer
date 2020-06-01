@@ -6,12 +6,14 @@
 
 Player::Player()
 {
-    connect(&m_mediaPlayer, &QMediaPlayer::mediaStatusChanged,
-            this, &Player::onMediaStatusChanged);
     connect(&m_playlist, &QMediaPlaylist::currentIndexChanged,
             this, &Player::onCurrentIndexChanged);
+    connect(&m_mediaPlayer, &QMediaPlayer::stateChanged,
+            this, &Player::onPlayerStateChanged);
+    m_positionTimer.callOnTimeout(this, &Player::onPositionTimerTimeout);
 
     m_mediaPlayer.setPlaylist(&m_playlist);
+    m_positionTimer.setInterval(500);
 }
 
 void Player::setPlaylist(const QVariantList &list)
@@ -30,14 +32,21 @@ void Player::setPlay(bool play)
         m_mediaPlayer.pause();
 }
 
-void Player::next()
+int Player::next()
 {
     m_playlist.next();
+    return m_playlist.currentIndex();
 }
 
-void Player::previous()
+int Player::previous()
 {
     m_playlist.previous();
+    return m_playlist.currentIndex();
+}
+
+void Player::seek(int64_t position)
+{
+    m_mediaPlayer.setPosition(position);
 }
 
 void Player::setShuffle(bool shuffle)
@@ -62,14 +71,6 @@ void Player::setServerBinder(const QAndroidBinder &serverBinder)
     m_serverBinder = serverBinder;
 }
 
-void Player::onMediaStatusChanged(QMediaPlayer::MediaStatus status)
-{
-    QAndroidParcel data;
-    data.writeVariant(QString("media status changed to "
-                              + QString::number(status)));
-    m_serverBinder.transact(MessageType::DEBUG, data);
-}
-
 void Player::onCurrentIndexChanged(int index)
 {
     if (m_playlist.playbackMode() == QMediaPlaylist::Random)
@@ -77,6 +78,21 @@ void Player::onCurrentIndexChanged(int index)
             m_playlist.next();
 
     m_nextIndex = m_playlist.nextIndex();
+}
+
+void Player::onPositionTimerTimeout()
+{
+    QAndroidParcel data;
+    data.writeVariant(m_mediaPlayer.position());
+    m_serverBinder.transact(MessageType::POSITION_CHANGED, data);
+}
+
+void Player::onPlayerStateChanged(QMediaPlayer::State state)
+{
+    if (state == QMediaPlayer::PlayingState)
+        m_positionTimer.start();
+    else
+        m_positionTimer.stop();
 }
 
 void Player::checkShuffleRepeat()

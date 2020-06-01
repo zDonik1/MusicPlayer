@@ -11,6 +11,8 @@ class MusicModel : public QAbstractListModel
 
     Q_PROPERTY(int currentPlaylist READ getCurrentPlaylist
                NOTIFY currentPlaylistChanged)
+    Q_PROPERTY(int currentMusic READ getCurrentMusicIndex
+               NOTIFY currentMusicIndexChanged)
 
 public:
     enum Roles
@@ -24,12 +26,13 @@ public:
     MusicModel();
 
     int getCurrentPlaylist() const;
-    int getCurrentMusic() const;
+    int getCurrentMusicIndex() const;
+    Music getCurrentMusic() const;
     Music getMusic(const QModelIndex &index) const;
     const std::vector<Music> &getAllMusic() const;
     std::vector<Music> &getAllMusic();
 
-    void setCurrentMusic(int currentMusic);
+    void setCurrentMusicIndex(int index);
     void setMusic(int playlistId, const std::vector<Music> &music);
     void addMusic(const Music &music);
     void deleteMusic(const QModelIndex &index);
@@ -44,9 +47,10 @@ public slots:
 
 signals:
     void currentPlaylistChanged();
+    void currentMusicIndexChanged();
 
 private:
     std::vector<Music> m_music;
     int m_currentPlaylist = -1;
-    int m_currentMusic = -1;
+    int m_currentMusicIndex = -1;
 };

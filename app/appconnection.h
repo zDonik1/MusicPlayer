@@ -18,6 +18,6 @@ public:
     const QAndroidBinder &getServerBinder();
 
 private:
-    AppBinder m_serverBinder;
     DataModel &m_dataModel;
+    AppBinder m_serverBinder;
 };

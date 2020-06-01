@@ -31,6 +31,10 @@ class DataModel : public QObject
     Q_PROPERTY(bool isPlaying READ isPlaying NOTIFY isPlayingChanged)
     Q_PROPERTY(bool isShuffle READ getShuffle NOTIFY shuffleChanged)
     Q_PROPERTY(bool isRepeat READ getRepeat NOTIFY repeatChanged)
+    Q_PROPERTY(qint64 musicDuration READ getCurrentMusicDuration
+               NOTIFY currentMusicDurationChanged)
+    Q_PROPERTY(qint64 musicPosition READ getCurrentMusicPosition
+               NOTIFY currentMusicPositionChanged)
 
 public:
     explicit DataModel(DatabaseManager &databaseManager,
@@ -40,16 +44,20 @@ public:
 
     void setClientBinder(const QAndroidBinder &clientBinder);
     void setMusicImageProvider(MusicImageProvider *imageProvider);
+    void setCurrentMusicPosition(int64_t position);
+
+public:
+    DirModel *getDirModel();
+    RootDirModel *getRootDirModel();
+    PlaylistModel *getPlaylistModel();
+    MusicModel *getMusicModel();
 
     const QString &getCurrentPlaylistName() const;
     bool isPlaying() const;
     bool getShuffle() const;
     bool getRepeat() const;
-
-    DirModel *getDirModel();
-    RootDirModel *getRootDirModel();
-    PlaylistModel *getPlaylistModel();
-    MusicModel *getMusicModel();
+    qint64 getCurrentMusicDuration() const;
+    qint64 getCurrentMusicPosition() const;
 
 public:
     Q_INVOKABLE void play();
@@ -90,9 +98,13 @@ signals:
     void isPlayingChanged();
     void shuffleChanged();
     void repeatChanged();
+    void currentMusicDurationChanged();
+    void currentMusicPositionChanged();
 
 private:
+    void initializePlayer();
     void setupPlayerToPlaylist(int id);
+    void updateOnMusicChanged(int index);
 
 private:
     DatabaseManager &m_databaseManager;
@@ -110,4 +122,6 @@ private:
     bool m_isPlaying = false;
     bool m_shuffle = false;
     bool m_repeat = false;
+    int64_t m_currentMusicDuration = 0;
+    int64_t m_currentMusicPosition = 0;
 };

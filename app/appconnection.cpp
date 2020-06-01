@@ -8,6 +8,7 @@
 
 AppConnection::AppConnection(DataModel &dataModel)
     : m_dataModel(dataModel)
+    , m_serverBinder(dataModel)
 {
 }
 

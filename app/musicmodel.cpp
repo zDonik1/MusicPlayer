@@ -12,9 +12,17 @@ int MusicModel::getCurrentPlaylist() const
     return m_currentPlaylist;
 }
 
-int MusicModel::getCurrentMusic() const
+int MusicModel::getCurrentMusicIndex() const
 {
-    return m_currentMusic;
+    return m_currentMusicIndex;
+}
+
+Music MusicModel::getCurrentMusic() const
+{
+    if (m_currentMusicIndex == -1)
+        return Music{};
+
+    return m_music.at(m_currentMusicIndex);
 }
 
 Music MusicModel::getMusic(const QModelIndex &index) const
@@ -32,9 +40,10 @@ std::vector<Music> &MusicModel::getAllMusic()
     return m_music;
 }
 
-void MusicModel::setCurrentMusic(int currentMusic)
+void MusicModel::setCurrentMusicIndex(int index)
 {
-    m_currentMusic = currentMusic;
+    m_currentMusicIndex = index;
+    emit currentMusicIndexChanged();
 }
 
 void MusicModel::setMusic(int playlistId, const std::vector<Music> &music)

@@ -87,6 +87,9 @@ Page {
         AppSlider {
             anchors.horizontalCenter: parent.horizontalCenter
             width: parent.width * 0.9
+            from: 0
+            to: dataModel.musicDuration
+            value: dataModel.musicPosition
 
             onMoved: logic.seek(position)
         }
