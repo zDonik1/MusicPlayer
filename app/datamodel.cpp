@@ -196,7 +196,8 @@ void DataModel::selectPlaylist(int index)
     auto music = m_databaseManager.getPlaylistMusicDAO()
             ->getMusicForPlaylist(playlist.id);
     m_musicModel->setMusic(playlist.id, music);
-    m_metaDataScanner.getMetaData(&m_musicModel->getAllMusic());
+
+    fetchMetaDataForAllMusic();
 
     QVariantList musicVarList;
     for (auto &m : music)
@@ -297,6 +298,8 @@ void DataModel::addDirToPlaylist(int dirIndex, int playlistIndex)
         QAndroidParcel data;
         data.writeVariant(musicVarList);
         m_clientBinder.transact(MessageType::MUSIC_ADDED, data);
+
+        fetchMetaDataForAllMusic();
     }
 }
 
@@ -312,13 +315,15 @@ void DataModel::addMusicToPlaylist(int musicIndex, int playlistIndex)
         return;
 
     if (playlistId == m_musicModel->getCurrentPlaylist()) {
-        m_musicModel->addMusic(Music{ musicId, file });
+        auto &addedMusic = m_musicModel->addMusic(Music{ musicId, file });
 
         QVariantList musicVarList;
         musicVarList.push_back(file);
         QAndroidParcel data;
         data.writeVariant(musicVarList);
         m_clientBinder.transact(MessageType::MUSIC_ADDED, data);
+
+        m_metaDataScanner.getMetaData(&addedMusic);
     }
 }
 
@@ -375,13 +380,17 @@ void DataModel::initializePlayer()
         m_musicModel->setMusic(-1, {});
     }
     else {
+        // setting up music model
         auto playlist = m_databaseManager.getPlaylistDAO()
                 ->getPlaylist(currentPlaylistVariant.toInt());
         auto music = m_databaseManager.getPlaylistMusicDAO()
                 ->getMusicForPlaylist(playlist.id);
         m_musicModel->setMusic(playlist.id, music);
-        m_metaDataScanner.getMetaData(&m_musicModel->getAllMusic());
 
+        // fetching metdata for music
+        fetchMetaDataForAllMusic();
+
+        // other stuff
         m_currentPlaylistName = playlist.name;
         emit currentPlaylistNameChanged();
 
@@ -398,6 +407,15 @@ void DataModel::initializePlayer()
     emit shuffleChanged();
     m_repeat = m_databaseManager.getSettingsDAO()->getValue("repeat").toBool();
     emit repeatChanged();
+}
+
+void DataModel::fetchMetaDataForAllMusic()
+{
+    auto &music = m_musicModel->getAllMusic();
+    std::vector<Music *> musicPtrs;
+    for (auto &m : music)
+        musicPtrs.emplace_back(&m);
+    m_metaDataScanner.getMetaData(std::move(musicPtrs));
 }
 
 void DataModel::updateOnMusicChanged(int index)

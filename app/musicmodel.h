@@ -34,7 +34,7 @@ public:
 
     void setCurrentMusicIndex(int index);
     void setMusic(int playlistId, const std::vector<Music> &music);
-    void addMusic(const Music &music);
+    Music &addMusic(const Music &music);
     void deleteMusic(const QModelIndex &index);
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;

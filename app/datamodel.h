@@ -105,6 +105,7 @@ signals:
 
 private:
     void initializePlayer();
+    void fetchMetaDataForAllMusic();
 
 private:
     DatabaseManager &m_databaseManager;

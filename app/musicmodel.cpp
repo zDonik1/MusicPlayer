@@ -59,11 +59,12 @@ void MusicModel::setMusic(int playlistId, const std::vector<Music> &music)
     emit currentPlaylistChanged();
 }
 
-void MusicModel::addMusic(const Music &music)
+Music &MusicModel::addMusic(const Music &music)
 {
     beginInsertRows(QModelIndex(), m_music.size(), m_music.size());
     m_music.emplace_back(music);
     endInsertRows();
+    return m_music.back();
 }
 
 void MusicModel::deleteMusic(const QModelIndex &index)

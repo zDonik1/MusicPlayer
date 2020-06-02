@@ -12,7 +12,8 @@ class MetaDataScanner : public QObject
 public:
     MetaDataScanner();
 
-    void getMetaData(std::vector<Music> *music);
+    void getMetaData(const std::vector<Music *> &music);
+    void getMetaData(Music *music);
 
 signals:
     void metaDataReady();
@@ -22,6 +23,6 @@ private slots:
 
 private:
     QMediaPlayer m_mediaPlayer;
-    std::vector<Music> *m_music = nullptr;
+    std::vector<Music *> m_music;
     int m_counter = -1;
 };
