@@ -20,7 +20,7 @@ public:
 
     void deletePlaylist(int id);
 
-    void addMusicToPlaylist(int musicId, int playlistId);
+    bool addMusicToPlaylist(int musicId, int playlistId);
     void deleteMusicFromPlaylist(int musicId, int playlistId);
 
 signals:

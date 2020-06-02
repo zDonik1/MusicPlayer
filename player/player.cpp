@@ -17,12 +17,16 @@ Player::Player()
     m_positionTimer.setInterval(500);
 }
 
-void Player::setPlaylist(const QVariantList &list)
+void Player::setPlaylist(const QList<QMediaContent> &musicUrls)
 {
     m_mediaPlayer.stop();
     m_playlist.clear();
-    for (auto &variant : list)
-        m_playlist.addMedia(QUrl::fromLocalFile(variant.toUrl().toString()));
+    addMusicToPlaylist(musicUrls);
+}
+
+void Player::addMusicToPlaylist(const QList<QMediaContent> &musicUrls)
+{
+    m_playlist.addMedia(musicUrls);
 }
 
 void Player::setPlay(bool play)

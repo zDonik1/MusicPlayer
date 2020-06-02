@@ -12,7 +12,8 @@ class Player : public QObject
 public:
     Player();
 
-    void setPlaylist(const QVariantList& list);
+    void setPlaylist(const QList<QMediaContent> &musicUrls);
+    void addMusicToPlaylist(const QList<QMediaContent> &musicUrls);
     void setPlay(bool play);
     int next();
     int previous();

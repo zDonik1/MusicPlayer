@@ -22,10 +22,19 @@ bool PlayerBinder::onTransact(int code, const QAndroidParcel &data,
     case MessageType::BINDER: {
         m_player.setServerBinder(data.readBinder());
         reply.writeBinder(*(new PlayerBinder(m_player)));
+        break;
     }
 
     case MessageType::LOAD_PLAYLIST: {
-        m_player.setPlaylist(data.readVariant().toList());
+        m_player.setPlaylist(
+                    varListToMediaContentList(data.readVariant().toList()));
+        break;
+    }
+
+    case MessageType::MUSIC_ADDED: {
+        m_player.addMusicToPlaylist(
+                    varListToMediaContentList(data.readVariant().toList()));
+        break;
     }
 
     case MessageType::PLAY: {
@@ -65,4 +74,13 @@ bool PlayerBinder::onTransact(int code, const QAndroidParcel &data,
     }
     }
     return true;
+}
+
+QList<QMediaContent> PlayerBinder::varListToMediaContentList(
+        const QVariantList &list)
+{
+    QList<QMediaContent> musicUrls;
+    for (auto &variant : list)
+        musicUrls.push_back(QUrl::fromLocalFile(variant.toUrl().toString()));
+    return musicUrls;
 }

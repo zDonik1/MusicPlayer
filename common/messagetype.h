@@ -4,7 +4,11 @@ enum MessageType
 {
     BINDER = 1,
     DEBUG,
+
     LOAD_PLAYLIST,
+    POSITION_CHANGED,
+    MUSIC_ADDED,
+
     PLAY,
     NEXT,
     PREVIOUS,
@@ -12,5 +16,4 @@ enum MessageType
     SHUFFLE,
     REPEAT,
     MUSIC_CHANGED,
-    POSITION_CHANGED,
 };

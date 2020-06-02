@@ -288,6 +288,13 @@ void DataModel::addDirToPlaylist(int dirIndex, int playlistIndex)
         auto music = m_databaseManager.getPlaylistMusicDAO()
                 ->getMusicForPlaylist(playlistId);
         m_musicModel->setMusic(playlistId, music);
+
+        QVariantList musicVarList;
+        for (auto &m : music)
+            musicVarList.push_back(m.path);
+        QAndroidParcel data;
+        data.writeVariant(musicVarList);
+        m_clientBinder.transact(MessageType::MUSIC_ADDED, data);
     }
 }
 
@@ -297,11 +304,19 @@ void DataModel::addMusicToPlaylist(int musicIndex, int playlistIndex)
     int playlistId = m_playlistModel->getPlaylist(m_playlistModel
                                                   ->index(playlistIndex)).id;
     int musicId = m_databaseManager.getMusicDAO()->createMusic(file);
-    m_databaseManager.getPlaylistMusicDAO()
+    bool success = m_databaseManager.getPlaylistMusicDAO()
             ->addMusicToPlaylist(musicId, playlistId);
+    if (!success)
+        return;
 
     if (playlistId == m_musicModel->getCurrentPlaylist()) {
         m_musicModel->addMusic(Music{ musicId, file });
+
+        QVariantList musicVarList;
+        musicVarList.push_back(file);
+        QAndroidParcel data;
+        data.writeVariant(musicVarList);
+        m_clientBinder.transact(MessageType::MUSIC_ADDED, data);
     }
 }
 
@@ -381,20 +396,6 @@ void DataModel::initializePlayer()
     emit shuffleChanged();
     m_repeat = m_databaseManager.getSettingsDAO()->getValue("repeat").toBool();
     emit repeatChanged();
-}
-
-void DataModel::setupPlayerToPlaylist(int id)
-{
-    auto music = m_databaseManager.getPlaylistMusicDAO()
-            ->getMusicForPlaylist(id);
-    m_musicModel->setMusic(id, music);
-
-    QVariantList musicVarList;
-    for (auto &m : music)
-        musicVarList.push_back(std::move(m.path));
-    QAndroidParcel data;
-    data.writeVariant(musicVarList);
-    m_clientBinder.transact(MessageType::LOAD_PLAYLIST, data);
 }
 
 void DataModel::updateOnMusicChanged(int index)

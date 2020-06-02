@@ -106,7 +106,7 @@ void PlaylistMusicDAO::deletePlaylist(int id)
     query.exec(queryString);
 }
 
-void PlaylistMusicDAO::addMusicToPlaylist(int musicId, int playlistId)
+bool PlaylistMusicDAO::addMusicToPlaylist(int musicId, int playlistId)
 {
     if (musicId < 0 || playlistId < 0)
         throw std::out_of_range("PlaylistMusicDAO::addMusicToPlaylist: "
@@ -116,8 +116,12 @@ void PlaylistMusicDAO::addMusicToPlaylist(int musicId, int playlistId)
     QString queryString = QStringLiteral
             ("insert into %1 (music_id, playlist_id) values (%2, %3)")
             .arg(tableName()).arg(musicId).arg(playlistId);
-    if (query.exec(queryString))
+    if (query.exec(queryString)) {
         emit musicAddedToPlaylist(playlistId);
+        return true;
+    }
+
+    return false;
 }
 
 void PlaylistMusicDAO::deleteMusicFromPlaylist(int musicId, int playlistId)

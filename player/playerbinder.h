@@ -3,6 +3,7 @@
 #include <QAndroidBinder>
 #include <QDir>
 #include <QMap>
+#include <QMediaContent>
 
 class QAndroidParcel;
 class Player;
@@ -16,6 +17,9 @@ public:
     bool onTransact(int code, const QAndroidParcel &data,
                     const QAndroidParcel &reply,
                     QAndroidBinder::CallType flags) override;
+
+private:
+    QList<QMediaContent> varListToMediaContentList(const QVariantList &list);
 
 private:
     Player &m_player;

@@ -103,7 +103,6 @@ signals:
 
 private:
     void initializePlayer();
-    void setupPlayerToPlaylist(int id);
     void updateOnMusicChanged(int index);
 
 private:
