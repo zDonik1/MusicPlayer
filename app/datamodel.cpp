@@ -177,6 +177,11 @@ void DataModel::repeat()
 
 void DataModel::changeMusic(int index)
 {
+    if (index == m_musicModel->getCurrentMusicIndex()) {
+        play();
+        return;
+    }
+
     QAndroidParcel data;
     data.writeVariant(index);
     m_clientBinder.transact(MessageType::MUSIC_CHANGED, data);
