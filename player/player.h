@@ -15,8 +15,8 @@ public:
     void setPlaylist(const QList<QMediaContent> &musicUrls);
     void addMusicToPlaylist(const QList<QMediaContent> &musicUrls);
     void setPlay(bool play);
-    int next();
-    int previous();
+    void next();
+    void previous();
     void seek(int64_t position);
     void setShuffle(bool shuffle);
     void setRepeat(bool repeat);
@@ -31,6 +31,8 @@ public slots:
 
 private:
     void debug(const QString &message); // helper function for debugging service
+    void setRandomIndex(bool forced);
+    void sendChangedIndex();
 
 private:
     QMediaPlaylist m_playlist;
@@ -41,5 +43,5 @@ private:
     bool m_shuffle = false;
     bool m_repeat = false;
 
-    bool m_doneChangingIndex = false;
+    bool m_generateRandomIndex = true;
 };

@@ -37,16 +37,20 @@ void Player::setPlay(bool play)
         m_mediaPlayer.pause();
 }
 
-int Player::next()
+void Player::next()
 {
-    m_playlist.next();
-    return m_playlist.currentIndex();
+    if (!m_shuffle)
+        m_playlist.next();
+    else
+        setRandomIndex(true);
 }
 
-int Player::previous()
+void Player::previous()
 {
-    m_playlist.previous();
-    return m_playlist.currentIndex();
+    if (!m_shuffle)
+        m_playlist.previous();
+    else
+        setRandomIndex(true);
 }
 
 void Player::seek(int64_t position)
@@ -70,7 +74,10 @@ void Player::setRepeat(bool repeat)
 
 void Player::changeMusic(int index)
 {
+    if (m_shuffle)
+        m_generateRandomIndex = false;
     m_playlist.setCurrentIndex(index);
+    m_mediaPlayer.play();
 }
 
 void Player::setServerBinder(const QAndroidBinder &serverBinder)
@@ -80,20 +87,18 @@ void Player::setServerBinder(const QAndroidBinder &serverBinder)
 
 void Player::onCurrentIndexChanged(int /*index*/)
 {
-    if (!m_shuffle)
+    if (!m_shuffle || m_playlist.mediaCount() == 1) {
+        sendChangedIndex();
         return;
-
-    if (m_doneChangingIndex)
-        return;
-
-    int generatedIndex = m_playlist.previousIndex();
-    while (generatedIndex == m_playlist.previousIndex()) {
-        generatedIndex = QRandomGenerator::global()->generate()
-                % m_playlist.mediaCount();
     }
-    m_doneChangingIndex = true;
-    m_playlist.setCurrentIndex(generatedIndex);
-    m_doneChangingIndex = false;
+
+    if (!m_generateRandomIndex) {
+        sendChangedIndex();
+        m_generateRandomIndex = true;
+        return;
+    }
+
+    setRandomIndex(false);
 }
 
 void Player::onPlayerStateChanged(QMediaPlayer::State state)
@@ -116,4 +121,29 @@ void Player::debug(const QString &message)
     QAndroidParcel data;
     data.writeVariant(message);
     m_serverBinder.transact(MessageType::DEBUG, data);
+}
+
+void Player::setRandomIndex(bool forced)
+{
+    int lastMusicPlayedIndex;
+    if (forced)
+        lastMusicPlayedIndex = m_playlist.currentIndex();
+    else
+        lastMusicPlayedIndex = m_playlist.previousIndex();
+
+    int generatedIndex = lastMusicPlayedIndex;
+    while (generatedIndex == lastMusicPlayedIndex) {
+        generatedIndex = QRandomGenerator::global()->generate()
+                % m_playlist.mediaCount();
+    }
+    m_generateRandomIndex = false;
+    m_playlist.setCurrentIndex(generatedIndex);
+    m_mediaPlayer.play();
+}
+
+void Player::sendChangedIndex()
+{
+    QAndroidParcel data;
+    data.writeVariant(m_playlist.currentIndex());
+    m_serverBinder.transact(MessageType::MUSIC_CHANGED, data);
 }

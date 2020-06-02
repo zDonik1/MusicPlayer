@@ -25,6 +25,11 @@ bool AppBinder::onTransact(int code, const QAndroidParcel &data,
         m_dataModel.setCurrentMusicPosition(data.readVariant().toLongLong());
         break;
     }
+
+    case MessageType::MUSIC_CHANGED: {
+        m_dataModel.updateOnMusicChanged(data.readVariant().toInt());
+        break;
+    }
     }
     return true;
 }

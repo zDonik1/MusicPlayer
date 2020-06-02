@@ -43,12 +43,12 @@ bool PlayerBinder::onTransact(int code, const QAndroidParcel &data,
     }
 
     case MessageType::NEXT: {
-        reply.writeVariant(m_player.next());
+        m_player.next();
         break;
     }
 
     case MessageType::PREVIOUS: {
-        reply.writeVariant(m_player.previous());
+        m_player.previous();
         break;
     }
 
@@ -69,7 +69,6 @@ bool PlayerBinder::onTransact(int code, const QAndroidParcel &data,
 
     case MessageType::MUSIC_CHANGED: {
         m_player.changeMusic(data.readVariant().toInt());
-        m_player.setPlay(true);
         break;
     }
     }

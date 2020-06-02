@@ -46,6 +46,8 @@ public:
     void setMusicImageProvider(MusicImageProvider *imageProvider);
     void setCurrentMusicPosition(int64_t position);
 
+    void updateOnMusicChanged(int index);
+
 public:
     DirModel *getDirModel();
     RootDirModel *getRootDirModel();
@@ -103,7 +105,6 @@ signals:
 
 private:
     void initializePlayer();
-    void updateOnMusicChanged(int index);
 
 private:
     DatabaseManager &m_databaseManager;

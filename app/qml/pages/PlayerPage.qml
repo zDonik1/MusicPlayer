@@ -17,7 +17,8 @@ Page {
            : dataModel.currentPlaylistName
 
     AppListView {
-        property int selected: -1
+        property real delegateHeight: dp(68)
+        property int currentMusic: dataModel.musicModel.currentMusic
 
         id: listView
         anchors {
@@ -26,21 +27,36 @@ Page {
             left: parent.left
             bottom: controllerColumn.top
         }
+        backgroundColor: Theme.backgroundColor
         model: dataModel.musicModel
+        highlight: componentHighlight
+        highlightFollowsCurrentItem: false
 
         delegate: MusicDelegate {
-            backgroundColor: index === listView.selected
-                             ? Theme.listItem.selectedBackgroundColor
-                             : Theme.backgroundColor
+            height: listView.delegateHeight
+            backgroundColor: "transparent"
             title: r_title
             duration: timeToText(r_duration)
             image: "image://musicImage/" + index
             isDefaultImage: r_isDefaultImage
 
             onClicked: {
-                listView.selected = index
+                listView.currentIndex = index
                 logic.musicChanged(index)
             }
+        }
+    }
+
+    Component {
+        id: componentHighlight
+
+        Rectangle {
+            y: listView.itemAtIndex(listView.currentMusic).y
+            width: listView.width
+            height: listView.delegateHeight
+            color: listView.currentMusic === -1
+                   ? "transparent"
+                   : Theme.listItem.selectedBackgroundColor
         }
     }
 
@@ -58,7 +74,7 @@ Page {
     AppButton {
         // '0' - no playlist, '1' - no music, '-1' - no intent
         property int intent: dataModel.musicModel.currentPlaylist === -1
-                                ? 0 : (listView.count === 0 ? 1 : -1)
+                             ? 0 : (listView.count === 0 ? 1 : -1)
 
         anchors.centerIn: parent
         text: intent === 0
@@ -100,7 +116,7 @@ Page {
                 flat: true
                 minimumWidth: root.width / 5
                 textColor: dataModel.isShuffle ? Theme.tintColor
-                                             : Theme.disabledColor
+                                               : Theme.disabledColor
 
                 onClicked: logic.shuffle()
             }
@@ -134,7 +150,7 @@ Page {
                 flat: true
                 minimumWidth: root.width / 5
                 textColor: dataModel.isRepeat ? Theme.tintColor
-                                            : Theme.disabledColor
+                                              : Theme.disabledColor
 
                 onClicked: logic.repeat()
             }

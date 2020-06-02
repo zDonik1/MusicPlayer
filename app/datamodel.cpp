@@ -139,14 +139,12 @@ void DataModel::next()
 {
     QAndroidParcel reply;
     m_clientBinder.transact(MessageType::NEXT, QAndroidParcel(), &reply);
-    updateOnMusicChanged(reply.readVariant().toInt());
 }
 
 void DataModel::previous()
 {
     QAndroidParcel reply;
     m_clientBinder.transact(MessageType::PREVIOUS, QAndroidParcel(), &reply);
-    updateOnMusicChanged(reply.readVariant().toInt());
 }
 
 void DataModel::seek(double position)
@@ -183,7 +181,6 @@ void DataModel::changeMusic(int index)
     data.writeVariant(index);
     m_clientBinder.transact(MessageType::MUSIC_CHANGED, data);
 
-    updateOnMusicChanged(index);
     m_isPlaying = true;
     emit isPlayingChanged();
 }
