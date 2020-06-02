@@ -55,6 +55,7 @@ void MusicModel::setMusic(int playlistId, const std::vector<Music> &music)
     m_music = std::move(music);
     endResetModel();
 
+    setCurrentMusicIndex(-1);
     m_currentPlaylist = playlistId;
     emit currentPlaylistChanged();
 }

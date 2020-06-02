@@ -192,6 +192,9 @@ void DataModel::changeMusic(int index)
 
 void DataModel::selectPlaylist(int index)
 {
+    if (index == m_musicModel->getCurrentPlaylist())
+        return;
+
     auto playlist = m_playlistModel->getPlaylist(m_playlistModel->index(index));
     auto music = m_databaseManager.getPlaylistMusicDAO()
             ->getMusicForPlaylist(playlist.id);
@@ -208,6 +211,8 @@ void DataModel::selectPlaylist(int index)
 
     m_databaseManager.getSettingsDAO()->storeValue("current_playlist",
                                                    playlist.id);
+    m_databaseManager.getSettingsDAO()->storeValue("current_music_index",
+                                                   -1);
     m_currentPlaylistName = playlist.name;
     emit currentPlaylistNameChanged();
 }
