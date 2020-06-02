@@ -17,6 +17,7 @@ public:
     QVariant getValue(const QString &key);
     bool storeValue(const QString &key, const QString &value);
     bool storeValue(const QString &key, int value);
+    bool storeValue(const QString &key, int64_t value);
     bool storeValue(const QString &key, bool value);
 
 private:

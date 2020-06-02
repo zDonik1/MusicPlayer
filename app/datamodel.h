@@ -39,6 +39,7 @@ class DataModel : public QObject
 public:
     explicit DataModel(DatabaseManager &databaseManager,
                        QObject *parent = nullptr);
+    ~DataModel();
 
     const QAndroidBinder &getClientBinder() const;
 

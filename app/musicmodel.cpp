@@ -42,6 +42,7 @@ std::vector<Music> &MusicModel::getAllMusic()
 
 void MusicModel::setCurrentMusicIndex(int index)
 {
+    qDebug() << "music index changed to:" << index;
     m_currentMusicIndex = index;
     emit currentMusicIndexChanged();
 }

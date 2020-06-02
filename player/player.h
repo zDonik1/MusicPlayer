@@ -14,13 +14,14 @@ public:
 
     void setPlaylist(const QList<QMediaContent> &musicUrls);
     void addMusicToPlaylist(const QList<QMediaContent> &musicUrls);
+
     void setPlay(bool play);
     void next();
     void previous();
     void seek(int64_t position);
     void setShuffle(bool shuffle);
     void setRepeat(bool repeat);
-    void changeMusic(int index);
+    void setMusicIndex(int index);
 
     void setServerBinder(const QAndroidBinder &serverBinder);
 

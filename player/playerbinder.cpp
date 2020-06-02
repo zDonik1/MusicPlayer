@@ -31,6 +31,11 @@ bool PlayerBinder::onTransact(int code, const QAndroidParcel &data,
         break;
     }
 
+    case MessageType::LOAD_MUSIC_INDEX: {
+        m_player.setMusicIndex(data.readVariant().toInt());
+        break;
+    }
+
     case MessageType::MUSIC_ADDED: {
         m_player.addMusicToPlaylist(
                     varListToMediaContentList(data.readVariant().toList()));
@@ -68,7 +73,8 @@ bool PlayerBinder::onTransact(int code, const QAndroidParcel &data,
     }
 
     case MessageType::MUSIC_CHANGED: {
-        m_player.changeMusic(data.readVariant().toInt());
+        m_player.setMusicIndex(data.readVariant().toInt());
+        m_player.setPlay(true);
         break;
     }
     }

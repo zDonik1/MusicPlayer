@@ -6,6 +6,7 @@ enum MessageType
     DEBUG,
 
     LOAD_PLAYLIST,
+    LOAD_MUSIC_INDEX,
     POSITION_CHANGED,
     MUSIC_ADDED,
 

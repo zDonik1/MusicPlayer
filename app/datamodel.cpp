@@ -52,6 +52,21 @@ DataModel::DataModel(DatabaseManager &databaseManager, QObject *parent)
     initializePlayer();
 }
 
+DataModel::~DataModel()
+{
+    m_databaseManager.getSettingsDAO()->storeValue("shuffle", m_shuffle);
+    m_databaseManager.getSettingsDAO()->storeValue("repeat", m_repeat);
+    m_databaseManager.getSettingsDAO()
+            ->storeValue("current_playlist",
+                         m_musicModel->getCurrentPlaylist());
+    m_databaseManager.getSettingsDAO()
+            ->storeValue("current_music_index",
+                         m_musicModel->getCurrentMusicIndex());
+    m_databaseManager.getSettingsDAO()
+            ->storeValue("current_music_position",
+                         m_currentMusicPosition);
+}
+
 const QAndroidBinder &DataModel::getClientBinder() const
 {
     return m_clientBinder;
@@ -162,7 +177,6 @@ void DataModel::shuffle()
     QAndroidParcel data;
     data.writeVariant(m_shuffle);
     m_clientBinder.transact(MessageType::SHUFFLE, data);
-    m_databaseManager.getSettingsDAO()->storeValue("shuffle", m_shuffle);
 }
 
 void DataModel::repeat()
@@ -172,7 +186,6 @@ void DataModel::repeat()
     QAndroidParcel data;
     data.writeVariant(m_repeat);
     m_clientBinder.transact(MessageType::REPEAT, data);
-    m_databaseManager.getSettingsDAO()->storeValue("repeat", m_repeat);
 }
 
 void DataModel::changeMusic(int index)
@@ -209,10 +222,6 @@ void DataModel::selectPlaylist(int index)
     data.writeVariant(musicVarList);
     m_clientBinder.transact(MessageType::LOAD_PLAYLIST, data);
 
-    m_databaseManager.getSettingsDAO()->storeValue("current_playlist",
-                                                   playlist.id);
-    m_databaseManager.getSettingsDAO()->storeValue("current_music_index",
-                                                   -1);
     m_currentPlaylistName = playlist.name;
     emit currentPlaylistNameChanged();
 }
@@ -236,7 +245,6 @@ void DataModel::deletePlaylist(int index)
     m_databaseManager.getPlaylistMusicDAO()->deletePlaylist(id);
     if (id == m_musicModel->getCurrentPlaylist()) {
         m_musicModel->setMusic(-1, {});
-        m_databaseManager.getSettingsDAO()->storeValue("current_playlist", -1);
     }
 }
 
@@ -405,6 +413,11 @@ void DataModel::initializePlayer()
             updateOnMusicChanged(currentMusicVariant.toInt());
         else
             updateOnMusicChanged(-1);
+
+        QVariant musicPositionVariant = m_databaseManager.getSettingsDAO()
+                ->getValue("current_music_position");
+        m_currentMusicPosition = musicPositionVariant.toLongLong();
+        emit currentMusicPositionChanged();
     }
 
     m_shuffle = m_databaseManager.getSettingsDAO()
@@ -430,6 +443,4 @@ void DataModel::updateOnMusicChanged(int index)
     m_currentMusicPosition = 0;
     emit currentMusicDurationChanged();
     emit currentMusicPositionChanged();
-    m_databaseManager.getSettingsDAO()->storeValue("current_music_index",
-                                                   index);
 }

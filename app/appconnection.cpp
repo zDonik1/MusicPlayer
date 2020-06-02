@@ -36,19 +36,29 @@ const QAndroidBinder &AppConnection::getServerBinder()
 
 void AppConnection::initializePlayerService()
 {
+    auto &clientBinder = m_dataModel.getClientBinder();
+
     QVariantList musicVarList;
     auto music = m_dataModel.getMusicModel()->getAllMusic();
     for (auto &m : music)
         musicVarList.push_back(m.path);
     QAndroidParcel playlistData;
     playlistData.writeVariant(musicVarList);
-    m_dataModel.getClientBinder().transact(MessageType::LOAD_PLAYLIST,
-                                           playlistData);
+    clientBinder.transact(MessageType::LOAD_PLAYLIST, playlistData);
+
+    QAndroidParcel musicIndexData;
+    musicIndexData.writeVariant(m_dataModel.getMusicModel()
+                                ->getCurrentMusicIndex());
+    clientBinder.transact(MessageType::LOAD_MUSIC_INDEX, musicIndexData);
+
+    QAndroidParcel musicPositionData;
+    musicPositionData.writeVariant(m_dataModel.getCurrentMusicPosition());
+    clientBinder.transact(MessageType::SEEK, musicPositionData);
 
     QAndroidParcel shuffleData;
     shuffleData.writeVariant(m_dataModel.getShuffle());
-    m_dataModel.getClientBinder().transact(MessageType::SHUFFLE, shuffleData);
+    clientBinder.transact(MessageType::SHUFFLE, shuffleData);
     QAndroidParcel repeatData;
     repeatData.writeVariant(m_dataModel.getRepeat());
-    m_dataModel.getClientBinder().transact(MessageType::REPEAT, repeatData);
+    clientBinder.transact(MessageType::REPEAT, repeatData);
 }
