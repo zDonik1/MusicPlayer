@@ -38,7 +38,8 @@ App {
         onMusicRootDirAdded: dataModel.addMusicRootDir(path)
         onMusicRootDirDeleted: dataModel.deleteMusicRootDir(index)
 
-        onTablesDropped: dataModel.dropTables();
+        onTablesDropped: dataModel.dropTables()
+        onPlayerPageLoaded: dataModel.onPlayerPageLoaded()
     }
 
     Navigation {

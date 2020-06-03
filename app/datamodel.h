@@ -2,7 +2,6 @@
 
 #include <QObject>
 #include <QAndroidBinder>
-#include <QQmlListProperty>
 #include <QDir>
 
 #include "databasemanager.h"
@@ -85,8 +84,10 @@ public:
     Q_INVOKABLE void addMusicRootDir(const QUrl &path);
     Q_INVOKABLE void deleteMusicRootDir(int index);
 
+    Q_INVOKABLE void dropTables();
+    Q_INVOKABLE void onPlayerPageLoaded();
+
 public slots:
-    void dropTables();
     void onMetaDataReady();
 
 signals:

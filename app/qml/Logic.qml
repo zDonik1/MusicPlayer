@@ -23,4 +23,5 @@ Item {
     signal musicRootDirDeleted(int index)
 
     signal tablesDropped()
+    signal playerPageLoaded()
 }

@@ -10,6 +10,7 @@
 #include <QUrl>
 #include <QThread>
 #include <QMediaPlayer>
+#include <QTimer>
 #include <QDebug>
 
 #include <messagetype.h>
@@ -369,6 +370,15 @@ void DataModel::dropTables()
     m_rootDirModel->setRootDirs({});
     m_playlistModel->setPlaylists({});
     m_musicModel->setMusic(-1, {});
+}
+
+void DataModel::onPlayerPageLoaded()
+{
+    // emitting singal after a delay since slider doesn't get updated
+    QTimer::singleShot(270, [this] ()
+    {
+        emit currentMusicPositionChanged();
+    });
 }
 
 void DataModel::onMetaDataReady()

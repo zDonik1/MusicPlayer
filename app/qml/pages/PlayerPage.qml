@@ -16,6 +16,8 @@ Page {
            ? qsTr("Music Player")
            : dataModel.currentPlaylistName
 
+    Component.onCompleted: logic.playerPageLoaded()
+
     AppListView {
         property real delegateHeight: dp(68)
         property int currentMusic: dataModel.musicModel.currentMusic

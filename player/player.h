@@ -21,7 +21,7 @@ public:
     void seek(int64_t position);
     void setShuffle(bool shuffle);
     void setRepeat(bool repeat);
-    void setMusicIndex(int index);
+    void setMusicIndex(int index, bool update = true);
 
     void setServerBinder(const QAndroidBinder &serverBinder);
 
@@ -45,4 +45,5 @@ private:
     bool m_repeat = false;
 
     bool m_generateRandomIndex = true;
+    bool m_updateMusicIndex = true;
 };

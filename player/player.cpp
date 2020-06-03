@@ -72,10 +72,11 @@ void Player::setRepeat(bool repeat)
         m_playlist.setPlaybackMode(QMediaPlaylist::Loop);
 }
 
-void Player::setMusicIndex(int index)
+void Player::setMusicIndex(int index, bool update)
 {
     if (m_shuffle)
         m_generateRandomIndex = false;
+    m_updateMusicIndex = update;
     m_playlist.setCurrentIndex(index);
 }
 
@@ -87,12 +88,18 @@ void Player::setServerBinder(const QAndroidBinder &serverBinder)
 void Player::onCurrentIndexChanged(int /*index*/)
 {
     if (!m_shuffle || m_playlist.mediaCount() == 1) {
-        sendChangedIndex();
+        if (m_updateMusicIndex)
+            sendChangedIndex();
+        else
+            m_updateMusicIndex = true;
         return;
     }
 
     if (!m_generateRandomIndex) {
-        sendChangedIndex();
+        if (m_updateMusicIndex)
+            sendChangedIndex();
+        else
+            m_updateMusicIndex = true;
         m_generateRandomIndex = true;
         return;
     }

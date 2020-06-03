@@ -32,7 +32,7 @@ bool PlayerBinder::onTransact(int code, const QAndroidParcel &data,
     }
 
     case MessageType::LOAD_MUSIC_INDEX: {
-        m_player.setMusicIndex(data.readVariant().toInt());
+        m_player.setMusicIndex(data.readVariant().toInt(), false);
         break;
     }
 
