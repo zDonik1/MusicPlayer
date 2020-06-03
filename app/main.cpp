@@ -10,7 +10,10 @@
 #include <QAndroidJniObject>
 
 #include "appconnection.h"
+#include "databasemanager.h"
+#include "appstate.h"
 #include "datamodel.h"
+#include "musicimageprovider.h"
 
 int main(int argc, char *argv[])
 {
@@ -26,9 +29,10 @@ int main(int argc, char *argv[])
                 QtAndroid::androidActivity().object());
     qDebug() << "~~~ ending call startService";
 
-    // Initializing DataModel
+    // Initializing app objects
     DatabaseManager databaseManager;
-    DataModel dataModel(databaseManager);
+    AppState appState(*databaseManager.getSettingsDAO());
+    DataModel dataModel(databaseManager, appState);
 
     // Connecting to service
     AppConnection connection(dataModel);
@@ -41,7 +45,6 @@ int main(int argc, char *argv[])
         qDebug() << "~~~  binding success";
     }
 
-
     // Initializing felgo application
     QApplication app(argc, argv);
     FelgoApplication felgo;
@@ -52,6 +55,7 @@ int main(int argc, char *argv[])
 
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty("dataModel", &dataModel);
+    engine.rootContext()->setContextProperty("appState", &appState);
     engine.addImageProvider("musicImage", imageProvider);
     felgo.initialize(&engine);
 

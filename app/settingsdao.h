@@ -14,7 +14,7 @@ public:
     void reset() override;
     static QString tableName();
 
-    QVariant getValue(const QString &key);
+    QVariant getValue(const QString &key) const;
     bool storeValue(const QString &key, const QString &value);
     bool storeValue(const QString &key, int value);
     bool storeValue(const QString &key, int64_t value);

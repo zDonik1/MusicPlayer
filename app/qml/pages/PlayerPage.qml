@@ -12,15 +12,15 @@ Page {
     }
 
     id: root
-    title: dataModel.currentPlaylistName === ""
+    title: appState.currentPlaylistName === ""
            ? qsTr("Music Player")
-           : dataModel.currentPlaylistName
+           : appState.currentPlaylistName
 
     Component.onCompleted: logic.playerPageLoaded()
 
     AppListView {
         property real delegateHeight: dp(68)
-        property int currentMusic: dataModel.musicModel.currentMusic
+        property int currentMusic: appState.currentMusic
 
         id: listView
         anchors {
@@ -75,7 +75,7 @@ Page {
 
     AppButton {
         // '0' - no playlist, '1' - no music, '-1' - no intent
-        property int intent: dataModel.musicModel.currentPlaylist === -1
+        property int intent: appState.currentPlaylist === -1
                              ? 0 : (listView.count === 0 ? 1 : -1)
 
         anchors.centerIn: parent
@@ -106,8 +106,8 @@ Page {
             anchors.horizontalCenter: parent.horizontalCenter
             width: parent.width * 0.9
             from: 0
-            to: dataModel.musicDuration
-            value: dataModel.musicPosition
+            to: appState.musicDuration
+            value: appState.musicPosition
 
             onMoved: logic.seek(position)
         }
@@ -117,7 +117,7 @@ Page {
                 icon: IconType.random
                 flat: true
                 minimumWidth: root.width / 5
-                textColor: dataModel.isShuffle ? Theme.tintColor
+                textColor: appState.isShuffle ? Theme.tintColor
                                                : Theme.disabledColor
 
                 onClicked: logic.shuffle()
@@ -132,7 +132,7 @@ Page {
             }
 
             AppButton {
-                icon: dataModel.isPlaying ? IconType.pause : IconType.play
+                icon: appState.isPlaying ? IconType.pause : IconType.play
                 flat: true
                 minimumWidth: root.width / 5
 
@@ -151,7 +151,7 @@ Page {
                 icon: IconType.undo
                 flat: true
                 minimumWidth: root.width / 5
-                textColor: dataModel.isRepeat ? Theme.tintColor
+                textColor: appState.isRepeat ? Theme.tintColor
                                               : Theme.disabledColor
 
                 onClicked: logic.repeat()

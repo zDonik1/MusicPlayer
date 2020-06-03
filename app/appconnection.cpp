@@ -5,6 +5,7 @@
 
 #include <messagetype.h>
 #include "datamodel.h"
+#include "appstate.h"
 
 AppConnection::AppConnection(DataModel &dataModel)
     : m_dataModel(dataModel)
@@ -46,19 +47,19 @@ void AppConnection::initializePlayerService()
     playlistData.writeVariant(musicVarList);
     clientBinder.transact(MessageType::LOAD_PLAYLIST, playlistData);
 
+    auto &appState = m_dataModel.getAppState();
     QAndroidParcel musicIndexData;
-    musicIndexData.writeVariant(m_dataModel.getMusicModel()
-                                ->getCurrentMusicIndex());
+    musicIndexData.writeVariant(appState.getCurrentMusicIndex());
     clientBinder.transact(MessageType::LOAD_MUSIC_INDEX, musicIndexData);
 
     QAndroidParcel musicPositionData;
-    musicPositionData.writeVariant(m_dataModel.getCurrentMusicPosition());
+    musicPositionData.writeVariant(appState.getCurrentMusicPosition());
     clientBinder.transact(MessageType::SEEK, musicPositionData);
 
     QAndroidParcel shuffleData;
-    shuffleData.writeVariant(m_dataModel.getShuffle());
+    shuffleData.writeVariant(appState.getShuffle());
     clientBinder.transact(MessageType::SHUFFLE, shuffleData);
     QAndroidParcel repeatData;
-    repeatData.writeVariant(m_dataModel.getRepeat());
+    repeatData.writeVariant(appState.getRepeat());
     clientBinder.transact(MessageType::REPEAT, repeatData);
 }

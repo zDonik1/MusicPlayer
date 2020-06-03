@@ -43,6 +43,7 @@ RESOURCES += resources.qrc # uncomment for publishing
 SOURCES += main.cpp \
     appbinder.cpp \
     appconnection.cpp \
+    appstate.cpp \
     databasemanager.cpp \
     datamodel.cpp \
     dirmodel.cpp \
@@ -62,6 +63,7 @@ HEADERS += \
     abstractdao.h \
     appbinder.h \
     appconnection.h \
+    appstate.h \
     databasemanager.h \
     datamodel.h \
     directory.h \

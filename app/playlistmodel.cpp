@@ -11,6 +11,20 @@ const Playlist &PlaylistModel::getPlaylist(const QModelIndex &index) const
     return m_playlists.at(index.row());
 }
 
+int PlaylistModel::getPlaylistIndex(int id) const
+{
+    if (id < 0 || m_playlists.size() == 0)
+        return -1;
+
+    int i;
+    for (i = 0; i < static_cast<int>(m_playlists.size()); ++i) {
+        if (m_playlists.at(i).id == id)
+            break;
+    }
+
+    return i;
+}
+
 void PlaylistModel::setPlaylists(const std::vector<Playlist> &playlists)
 {
     beginResetModel();

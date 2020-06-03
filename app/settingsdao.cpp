@@ -68,7 +68,7 @@ QString SettingsDAO::tableName()
     return "setting";
 }
 
-QVariant SettingsDAO::getValue(const QString &key)
+QVariant SettingsDAO::getValue(const QString &key) const
 {
     if (key.isEmpty())
         return QVariant();

@@ -20,6 +20,7 @@ public:
     PlaylistModel();
 
     const Playlist &getPlaylist(const QModelIndex &index) const;
+    int getPlaylistIndex(int id) const;
 
     void setPlaylists(const std::vector<Playlist> &playlists);
     void addPlaylist(const Playlist &playlist);
