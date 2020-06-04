@@ -16,6 +16,7 @@ Item {
     property alias duration: textDuration.text
     property bool isDefaultImage: true
     property string image: ""
+    property alias clickable: mouseArea.enabled
 
     id: root
     width: parent.width
@@ -103,6 +104,7 @@ Item {
     }
 
     RippleMouseArea {
+        id: mouseArea
         anchors.fill: parent
         circularBackground: false
 

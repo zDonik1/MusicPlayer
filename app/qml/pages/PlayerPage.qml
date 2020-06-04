@@ -102,14 +102,46 @@ Page {
             left: parent.left
         }
 
-        AppSlider {
-            anchors.horizontalCenter: parent.horizontalCenter
-            width: parent.width * 0.9
-            from: 0
-            to: appState.musicDuration
-            value: appState.musicPosition
+        Rectangle {
+            height: dp(1)
+            width: parent.width
+            color: Theme.tintColor
+        }
 
-            onMoved: logic.seek(position)
+        MusicDelegate {
+            id: currentMusicDisplay
+            height: listView.delegateHeight
+            backgroundColor: Qt.lighter(Qt.lighter(Theme.tintColor))
+            clickable: false
+            title: listView.currentMusic !== -1
+                   ? appState.musicTitle
+                   : "-----------------------"
+            duration: listView.currentMusic !== -1
+                      ? timeToText(appState.musicDuration)
+                      : "--:--"
+            image: "image://musicImage/" + listView.currentMusic
+            isDefaultImage: listview.currentMusic !== -1
+                            ? appState.isMusicDefaultImage
+                            : true
+        }
+
+        Item {
+            id: seekContainer
+            height: dp(40)
+            width: parent.width
+
+            AppSlider {
+                anchors {
+                    bottom: parent.bottom
+                    horizontalCenter: parent.horizontalCenter
+                }
+                width: parent.width * 0.9
+                from: 0
+                to: appState.musicDuration
+                value: appState.musicPosition
+
+                onMoved: logic.seek(position)
+            }
         }
 
         Row {

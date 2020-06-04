@@ -373,10 +373,7 @@ void DataModel::onMetaDataReady()
     m_musicModel->updateModelMetaData();
 
     if (m_appState.getCurrentMusicIndex() != -1) {
-        int64_t duration = m_musicModel
-                ->getMusic(m_musicModel->index(m_appState.getCurrentMusicIndex()))
-                .metaData.duration;
-        m_appState.setCurrentMusicDuration(duration);
+        updateCurrentMusicData();
     }
 
     auto &music = m_musicModel->getAllMusic();
@@ -400,4 +397,18 @@ void DataModel::fetchMetaDataForAllMusic()
     for (auto &m : music)
         musicPtrs.emplace_back(&m);
     m_metaDataScanner.getMetaData(std::move(musicPtrs));
+}
+
+void DataModel::updateCurrentMusicData()
+{
+    auto index = m_musicModel->index(m_appState.getCurrentMusicIndex());
+    QString title = m_musicModel
+            ->data(index, MusicModel::TitleRole).toString();
+    int64_t duration = m_musicModel
+            ->data(index, MusicModel::DurationRole).toLongLong();
+    bool isDefaultImage = m_musicModel
+            ->data(index, MusicModel::IsDefaultImageRole).toBool();
+    m_appState.setCurrentMusicTitle(title);
+    m_appState.setCurrentMusicDuration(duration);
+    m_appState.setIsCurrentMusicDefaultImage(isDefaultImage);
 }

@@ -9,6 +9,7 @@ class MusicModel : public QAbstractListModel
 {
     Q_OBJECT
 
+
 public:
     enum Roles
     {
@@ -32,6 +33,11 @@ public:
     QVariant data(const QModelIndex &index,
                   int role = Qt::DisplayRole) const override;
     QHash<int, QByteArray> roleNames() const override;
+
+public:
+    QString getCurrentTitle();
+    qint64 getCurrentDuration();
+    bool isCurrentDefaultImage();
 
 public slots:
     void updateModelMetaData();

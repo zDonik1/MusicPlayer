@@ -87,6 +87,7 @@ private slots:
 
 private:
     void fetchMetaDataForAllMusic();
+    void updateCurrentMusicData();
 
 private:
     DatabaseManager &m_databaseManager;

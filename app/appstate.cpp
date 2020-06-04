@@ -68,6 +68,16 @@ qint64 AppState::getCurrentMusicPosition() const
     return m_currentMusicPosition;
 }
 
+QString AppState::getCurrentMusicTitle() const
+{
+    return m_currentMusicTitle;
+}
+
+bool AppState::isCurrentMusicDefaultImage() const
+{
+    return m_isCurrentMusicDefaultImage;
+}
+
 bool AppState::isPlaying() const
 {
     return m_isPlaying;
@@ -111,6 +121,18 @@ void AppState::setCurrentMusicPosition(int64_t position)
 {
     m_currentMusicPosition = position;
     emit currentMusicPositionChanged();
+}
+
+void AppState::setCurrentMusicTitle(QString title)
+{
+    m_currentMusicTitle = title;
+    emit currentMusicTitleChanged();
+}
+
+void AppState::setIsCurrentMusicDefaultImage(bool isDefaultImage)
+{
+    m_isCurrentMusicDefaultImage = isDefaultImage;
+    emit isCurrentMusicDefaultImageChanged();
 }
 
 void AppState::setIsPlaying(bool playing)
