@@ -33,6 +33,8 @@ public:
                        QObject *parent = nullptr);
     ~DataModel();
 
+    void updateCurrentMusicData();
+
     const QAndroidBinder &getClientBinder() const;
     AppState &getAppState() const;
 
@@ -87,7 +89,6 @@ private slots:
 
 private:
     void fetchMetaDataForAllMusic();
-    void updateCurrentMusicData();
 
 private:
     DatabaseManager &m_databaseManager;

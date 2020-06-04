@@ -1,4 +1,4 @@
-#include "datamodel.h"
+﻿#include "datamodel.h"
 
 // so many includes in this class, don't you think?
 
@@ -153,7 +153,7 @@ void DataModel::seek(double position)
 
 void DataModel::shuffle()
 {
-    bool shuffle = m_appState.getShuffle();
+    bool shuffle = !m_appState.getShuffle();
     m_appState.setShuffle(shuffle);
     QAndroidParcel data;
     data.writeVariant(shuffle);
@@ -162,7 +162,7 @@ void DataModel::shuffle()
 
 void DataModel::repeat()
 {
-    bool repeat = m_appState.getRepeat();
+    bool repeat = !m_appState.getRepeat();
     m_appState.setRepeat(repeat);
     QAndroidParcel data;
     data.writeVariant(repeat);
@@ -222,7 +222,7 @@ void DataModel::deletePlaylist(int index)
     int id = m_playlistModel->deletePlaylist(m_playlistModel->index(index));
     m_databaseManager.getPlaylistDAO()->deletePlaylist(id);
     m_databaseManager.getPlaylistMusicDAO()->deletePlaylist(id);
-    if (id == m_appState.getCurrentPlaylistIndex()) {
+    if (index == m_appState.getCurrentPlaylistIndex()) {
         m_musicModel->setMusic(-1, {});
         m_appState.setCurrentPlaylistIndex(-1);
         m_appState.setCurrentMusicIndex(-1);
@@ -267,34 +267,18 @@ void DataModel::addDirToPlaylist(int dirIndex, int playlistIndex)
 {
     // big dirs freeze UI so adding music to DB in worker thread
     QThread *thread = new QThread;
-    MusicAddWorker *worker = new MusicAddWorker(
-                *m_dirModel, *m_playlistModel,
-                *m_databaseManager.getMusicDAO(),
-                *m_databaseManager.getPlaylistMusicDAO(),
-                dirIndex, playlistIndex);
+    MusicAddWorker *worker = new MusicAddWorker
+            (m_appState, m_metaDataScanner, m_clientBinder,
+             *m_dirModel, *m_playlistModel, *m_musicModel,
+             *m_databaseManager.getMusicDAO(),
+             *m_databaseManager.getPlaylistMusicDAO(),
+             dirIndex, playlistIndex);
     worker->moveToThread(thread);
     connect(thread, &QThread::started, worker, &MusicAddWorker::process);
     connect(worker, &MusicAddWorker::finished, thread, &QThread::quit);
     connect(worker, &MusicAddWorker::finished, worker, &QThread::deleteLater);
     connect(thread, &QThread::finished, thread, &QThread::deleteLater);
     thread->start();
-
-    int playlistId = m_playlistModel->getPlaylist(m_playlistModel
-                                                  ->index(playlistIndex)).id;
-    if (playlistId == m_appState.getCurrentPlaylistIndex()) {
-        auto music = m_databaseManager.getPlaylistMusicDAO()
-                ->getMusicForPlaylist(playlistId);
-        m_musicModel->setMusic(playlistId, music);
-
-        QVariantList musicVarList;
-        for (auto &m : music)
-            musicVarList.push_back(m.path);
-        QAndroidParcel data;
-        data.writeVariant(musicVarList);
-        m_clientBinder.transact(MessageType::MUSIC_ADDED, data);
-
-        fetchMetaDataForAllMusic();
-    }
 }
 
 void DataModel::addMusicToPlaylist(int musicIndex, int playlistIndex)

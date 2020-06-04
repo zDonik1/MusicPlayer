@@ -31,10 +31,7 @@ bool AppBinder::onTransact(int code, const QAndroidParcel &data,
     case MessageType::MUSIC_CHANGED: {
         int musicIndex = data.readVariant().toInt();
         appState.setCurrentMusicIndex(musicIndex);
-        auto *musicModel = m_dataModel.getMusicModel();
-        int64_t duration = musicModel
-                ->getMusic(musicModel->index(musicIndex)).metaData.duration;
-        appState.setCurrentMusicDuration(duration);
+        m_dataModel.updateCurrentMusicData();
         appState.setCurrentMusicPosition(0);
         break;
     }

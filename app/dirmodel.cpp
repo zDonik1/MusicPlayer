@@ -46,10 +46,9 @@ void DirModel::toggleDir(const QModelIndex &index)
     dataChanged(index, createIndex(i, 0), { Roles::IsOpen });
 }
 
-std::unique_ptr<std::vector<QString>> DirModel::getFilesInDir(
-        const QModelIndex &index) const
+std::vector<QString> DirModel::getFilesInDir(const QModelIndex &index) const
 {
-    auto result = std::make_unique<std::vector<QString>>();
+    std::vector<QString> result;
     if (!m_dirEntryInfo.at(index.row())["isDir"].toBool())
         return result;
 
@@ -61,8 +60,8 @@ std::unique_ptr<std::vector<QString>> DirModel::getFilesInDir(
             break;
         }
 
-        result->push_back(dirpath
-                          + m_dirEntryInfo.at(i)["filename"].toString());
+        result.push_back
+                (dirpath + "/" + m_dirEntryInfo.at(i)["filename"].toString());
     }
     return result;
 }

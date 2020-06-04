@@ -78,7 +78,7 @@ Page {
         property int intent: appState.currentPlaylist === -1
                              ? 0 : (listView.count === 0 ? 1 : -1)
 
-        anchors.centerIn: parent
+        anchors.centerIn: listView
         text: intent === 0
               ? qsTr("Select a playlist")
               : (intent === 1
@@ -120,7 +120,7 @@ Page {
                       ? timeToText(appState.musicDuration)
                       : "--:--"
             image: "image://musicImage/" + listView.currentMusic
-            isDefaultImage: listview.currentMusic !== -1
+            isDefaultImage: listView.currentMusic !== -1
                             ? appState.isMusicDefaultImage
                             : true
         }
