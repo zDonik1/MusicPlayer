@@ -11,9 +11,19 @@ class Player : public QObject
 
 public:
     Player();
+    ~Player();
+
+    void debug(const QString &message); // helper function for debugging service
+    QList<QMediaContent> varListToMediaContentList(const QVariantList &list);
+    bool load();
+    void save();
 
     void setPlaylist(const QList<QMediaContent> &musicUrls);
     void addMusicToPlaylist(const QList<QMediaContent> &musicUrls);
+    void clearPlaylist();
+    void sendPlaybackState();
+    int musicCount() const;
+    bool isStopped() const;
 
     void setPlay(bool play);
     void next();
@@ -31,7 +41,6 @@ public slots:
     void onPositionTimerTimeout();
 
 private:
-    void debug(const QString &message); // helper function for debugging service
     void setRandomIndex(bool forced);
     void sendChangedIndex();
 
@@ -45,5 +54,8 @@ private:
     bool m_repeat = false;
 
     bool m_generateRandomIndex = true;
-    bool m_updateMusicIndex = true;
+    bool m_updateMusicIndexOnce = true;
+
+    const QString playlistFilename = "playlist.pl";
+    const QString settingsFilename = "settings.dat";
 };

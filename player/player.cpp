@@ -2,6 +2,9 @@
 
 #include <QAndroidParcel>
 #include <QRandomGenerator>
+#include <QFile>
+#include <QDataStream>
+#include <QStandardPaths>
 
 #include <messagetype.h>
 
@@ -17,6 +20,63 @@ Player::Player()
     m_positionTimer.setInterval(500);
 }
 
+Player::~Player()
+{
+    save();
+    qDebug() << "^^^^ player destructor called: saved playlist";
+}
+
+void Player::debug(const QString &message)
+{
+    QAndroidParcel data;
+    data.writeVariant(message);
+    m_serverBinder.transact(MessageType::DEBUG, data);
+}
+
+QList<QMediaContent> Player::varListToMediaContentList(const QVariantList &list)
+{
+    QList<QMediaContent> musicUrls;
+    for (auto &variant : list)
+        musicUrls.push_back(QUrl::fromLocalFile(variant.toUrl().toString()));
+    return musicUrls;
+}
+
+bool Player::load()
+{
+    auto appDataLocation = QStandardPaths::writableLocation(
+                QStandardPaths::AppDataLocation);
+    QFile settingsFile(appDataLocation.append("/").append(settingsFilename));
+    if (!settingsFile.exists())
+        return false;
+
+    if (!settingsFile.open(QIODevice::ReadOnly))
+        return false;
+
+    QDataStream input;
+    int musicIndex;
+    quint64 musicDuration, musicPosition;
+    input >> musicIndex >> musicDuration >> musicPosition;
+
+    if (musicIndex < 0)
+        return false;
+
+    m_playlist.setCurrentIndex(musicIndex);
+    m_mediaPlayer.setPosition(musicPosition);
+    return true;
+}
+
+void Player::save()
+{
+    auto appDataLocation = QStandardPaths::writableLocation(
+                QStandardPaths::AppDataLocation);
+
+    QFile settingsFile(appDataLocation.append("/").append(settingsFilename));
+    settingsFile.open(QIODevice::WriteOnly);
+    QDataStream output;
+    output << m_playlist.currentIndex() << m_mediaPlayer.duration()
+           << m_mediaPlayer.position();
+}
+
 void Player::setPlaylist(const QList<QMediaContent> &musicUrls)
 {
     m_mediaPlayer.stop();
@@ -27,6 +87,32 @@ void Player::setPlaylist(const QList<QMediaContent> &musicUrls)
 void Player::addMusicToPlaylist(const QList<QMediaContent> &musicUrls)
 {
     m_playlist.addMedia(musicUrls);
+}
+
+void Player::clearPlaylist()
+{
+    m_playlist.clear();
+}
+
+void Player::sendPlaybackState()
+{
+    QAndroidParcel musicIndexData, musicPositionData, playData;
+    musicIndexData.writeVariant(m_playlist.currentIndex());
+    m_serverBinder.transact(MessageType::LOAD_MUSIC_INDEX, musicIndexData);
+    musicPositionData.writeVariant(m_mediaPlayer.position());
+    m_serverBinder.transact(MessageType::POSITION_CHANGED, musicPositionData);
+    playData.writeVariant(m_mediaPlayer.state() == QMediaPlayer::PlayingState);
+    m_serverBinder.transact(MessageType::PLAY, playData);
+}
+
+int Player::musicCount() const
+{
+    return m_playlist.mediaCount();
+}
+
+bool Player::isStopped() const
+{
+    return m_mediaPlayer.state() == QMediaPlayer::StoppedState;
 }
 
 void Player::setPlay(bool play)
@@ -76,7 +162,7 @@ void Player::setMusicIndex(int index, bool update)
 {
     if (m_shuffle)
         m_generateRandomIndex = false;
-    m_updateMusicIndex = update;
+    m_updateMusicIndexOnce = update;
     m_playlist.setCurrentIndex(index);
 }
 
@@ -88,18 +174,18 @@ void Player::setServerBinder(const QAndroidBinder &serverBinder)
 void Player::onCurrentIndexChanged(int /*index*/)
 {
     if (!m_shuffle || m_playlist.mediaCount() == 1) {
-        if (m_updateMusicIndex)
+        if (m_updateMusicIndexOnce)
             sendChangedIndex();
         else
-            m_updateMusicIndex = true;
+            m_updateMusicIndexOnce = true;
         return;
     }
 
     if (!m_generateRandomIndex) {
-        if (m_updateMusicIndex)
+        if (m_updateMusicIndexOnce)
             sendChangedIndex();
         else
-            m_updateMusicIndex = true;
+            m_updateMusicIndexOnce = true;
         m_generateRandomIndex = true;
         return;
     }
@@ -120,13 +206,6 @@ void Player::onPositionTimerTimeout()
     QAndroidParcel data;
     data.writeVariant(m_mediaPlayer.position());
     m_serverBinder.transact(MessageType::POSITION_CHANGED, data);
-}
-
-void Player::debug(const QString &message)
-{
-    QAndroidParcel data;
-    data.writeVariant(message);
-    m_serverBinder.transact(MessageType::DEBUG, data);
 }
 
 void Player::setRandomIndex(bool forced)

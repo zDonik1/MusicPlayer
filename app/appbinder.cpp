@@ -23,8 +23,18 @@ bool AppBinder::onTransact(int code, const QAndroidParcel &data,
         break;
     }
 
+    case MessageType::LOAD_MUSIC_INDEX: {
+        appState.setCurrentMusicIndex(data.readVariant().toInt());
+        break;
+    }
+
     case MessageType::POSITION_CHANGED: {
         appState.setCurrentMusicPosition(data.readVariant().toLongLong());
+        break;
+    }
+
+    case MessageType::PLAY: {
+        appState.setIsPlaying(data.readVariant().toBool());
         break;
     }
 

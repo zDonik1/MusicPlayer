@@ -26,19 +26,34 @@ bool PlayerBinder::onTransact(int code, const QAndroidParcel &data,
     }
 
     case MessageType::LOAD_PLAYLIST: {
-        m_player.setPlaylist(
-                    varListToMediaContentList(data.readVariant().toList()));
-        break;
-    }
+        // checking whether the service just started or is resuming
+        if (m_player.isStopped()) {
+            auto map = data.readVariant().toMap();
+            m_player.setPlaylist(m_player.varListToMediaContentList(
+                                     map.value("playlist").toList()));
+            m_player.setMusicIndex(map.value("music_index").toInt(), false);
+            m_player.seek(map.value("music_position").toLongLong());
 
-    case MessageType::LOAD_MUSIC_INDEX: {
-        m_player.setMusicIndex(data.readVariant().toInt(), false);
+            // load to check if there is any local playback state saved
+            // ... which is of higher priority than the state saved by app
+            if (m_player.load())
+                // if loaded, send state back to app
+                m_player.sendPlaybackState();
+        }
+        else
+            m_player.sendPlaybackState();
         break;
     }
 
     case MessageType::MUSIC_ADDED: {
-        m_player.addMusicToPlaylist(
-                    varListToMediaContentList(data.readVariant().toList()));
+        m_player.addMusicToPlaylist(m_player.varListToMediaContentList(
+                                        data.readVariant().toList()));
+        break;
+    }
+
+    case MessageType::CURRENT_PLAYLIST_DELETED: {
+        m_player.clearPlaylist();
+        m_player.save();
         break;
     }
 
@@ -77,15 +92,12 @@ bool PlayerBinder::onTransact(int code, const QAndroidParcel &data,
         m_player.setPlay(true);
         break;
     }
+
+    case MessageType::PLAYLIST_SELECTED: {
+        m_player.setPlaylist(m_player.varListToMediaContentList(
+                                 data.readVariant().toList()));
+        break;
+    }
     }
     return true;
-}
-
-QList<QMediaContent> PlayerBinder::varListToMediaContentList(
-        const QVariantList &list)
-{
-    QList<QMediaContent> musicUrls;
-    for (auto &variant : list)
-        musicUrls.push_back(QUrl::fromLocalFile(variant.toUrl().toString()));
-    return musicUrls;
 }

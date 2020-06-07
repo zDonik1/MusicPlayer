@@ -16,11 +16,8 @@ Page {
            ? qsTr("Music Player")
            : appState.currentPlaylistName
 
-    Component.onCompleted: logic.playerPageLoaded()
-
     AppListView {
         property real delegateHeight: dp(68)
-        property int currentMusic: appState.currentMusic
 
         id: listView
         anchors {
@@ -31,6 +28,7 @@ Page {
         }
         backgroundColor: Theme.backgroundColor
         model: dataModel.musicModel
+        currentIndex: appState.currentMusic
         highlight: componentHighlight
         highlightFollowsCurrentItem: false
 
@@ -42,10 +40,7 @@ Page {
             image: "image://musicImage/" + index
             isDefaultImage: r_isDefaultImage
 
-            onClicked: {
-                listView.currentIndex = index
-                logic.musicChanged(index)
-            }
+            onClicked: logic.musicChanged(index)
         }
     }
 
@@ -53,12 +48,11 @@ Page {
         id: componentHighlight
 
         Rectangle {
-            y: listView.itemAtIndex(listView.currentMusic).y
+            y: listView.currentItem.y
             width: listView.width
             height: listView.delegateHeight
-            color: listView.currentMusic === -1
-                   ? "transparent"
-                   : Theme.listItem.selectedBackgroundColor
+            color: Theme.listItem.selectedBackgroundColor
+            visible: listView.currentMusic !== -1
         }
     }
 
@@ -85,7 +79,7 @@ Page {
                  ? qsTr("Add music")
                  : "")
         flat: true
-        visible: intent !== ""
+        visible: intent !== -1
         enabled: visible
 
         onClicked: if (intent === 0)
@@ -150,7 +144,7 @@ Page {
                 flat: true
                 minimumWidth: root.width / 5
                 textColor: appState.isShuffle ? Theme.tintColor
-                                               : Theme.disabledColor
+                                              : Theme.disabledColor
 
                 onClicked: logic.shuffle()
             }
@@ -184,7 +178,7 @@ Page {
                 flat: true
                 minimumWidth: root.width / 5
                 textColor: appState.isRepeat ? Theme.tintColor
-                                              : Theme.disabledColor
+                                             : Theme.disabledColor
 
                 onClicked: logic.repeat()
             }

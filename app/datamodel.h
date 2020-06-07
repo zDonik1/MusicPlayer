@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include <QObject>
 #include <QAndroidBinder>
@@ -71,7 +71,6 @@ public:
     Q_INVOKABLE void deleteMusicRootDir(int index);
 
     Q_INVOKABLE void dropTables();
-    Q_INVOKABLE void onPlayerPageLoaded();
 
 public slots:
     void onMetaDataReady();

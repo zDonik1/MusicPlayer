@@ -56,6 +56,7 @@ int MusicModel::rowCount(const QModelIndex &/*parent*/) const
 
 QVariant MusicModel::data(const QModelIndex &index, int role) const
 {
+    qDebug() << "accessing music index:" << index.row() << "and role:" << role;
     if (!index.isValid())
         return QVariant();
 

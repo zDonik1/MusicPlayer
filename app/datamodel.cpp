@@ -1,4 +1,4 @@
-﻿#include "datamodel.h"
+#include "datamodel.h"
 
 // so many includes in this class, don't you think?
 
@@ -200,7 +200,7 @@ void DataModel::selectPlaylist(int index)
         musicVarList.push_back(std::move(m.path));
     QAndroidParcel data;
     data.writeVariant(musicVarList);
-    m_clientBinder.transact(MessageType::LOAD_PLAYLIST, data);
+    m_clientBinder.transact(MessageType::PLAYLIST_SELECTED, data);
 
     m_appState.setCurrentPlaylistName(playlist.name);
 }
@@ -226,6 +226,9 @@ void DataModel::deletePlaylist(int index)
         m_musicModel->setMusic(-1, {});
         m_appState.setCurrentPlaylistIndex(-1);
         m_appState.setCurrentMusicIndex(-1);
+
+        m_clientBinder.transact(MessageType::CURRENT_PLAYLIST_DELETED,
+                                QAndroidParcel());
     }
 }
 
@@ -340,16 +343,6 @@ void DataModel::dropTables()
     m_appState.setCurrentMusicIndex(-1);
     m_appState.setCurrentMusicDuration(0);
     m_appState.setCurrentMusicPosition(0);
-}
-
-void DataModel::onPlayerPageLoaded()
-{
-    // emitting singal after a delay since slider doesn't get updated
-    QTimer::singleShot(270, [this] ()
-    {
-        m_appState.setCurrentMusicPosition(
-                    m_appState.getCurrentMusicPosition());
-    });
 }
 
 void DataModel::onMetaDataReady()

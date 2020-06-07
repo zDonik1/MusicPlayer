@@ -19,8 +19,5 @@ public:
                     QAndroidBinder::CallType flags) override;
 
 private:
-    QList<QMediaContent> varListToMediaContentList(const QVariantList &list);
-
-private:
     Player &m_player;
 };

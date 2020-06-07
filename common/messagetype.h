@@ -9,6 +9,7 @@ enum MessageType
     LOAD_MUSIC_INDEX,
     POSITION_CHANGED,
     MUSIC_ADDED,
+    CURRENT_PLAYLIST_DELETED,
 
     PLAY,
     NEXT,
@@ -17,4 +18,5 @@ enum MessageType
     SHUFFLE,
     REPEAT,
     MUSIC_CHANGED,
+    PLAYLIST_SELECTED,
 };
