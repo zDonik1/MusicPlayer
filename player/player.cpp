@@ -19,10 +19,6 @@ Player::Player()
 
     m_mediaPlayer.setPlaylist(&m_playlist);
     m_positionTimer.setInterval(500);
-
-    m_javaService = QAndroidJniObject::callStaticObjectMethod
-            ("com/zdonik/musicplayer/PlayerService", "instance",
-             "()Lcom/zdonik/musicplayer/PlayerService;");
 }
 
 Player::~Player()
@@ -44,6 +40,13 @@ QList<QMediaContent> Player::varListToMediaContentList(const QVariantList &list)
     for (auto &variant : list)
         musicUrls.push_back(QUrl::fromLocalFile(variant.toUrl().toString()));
     return musicUrls;
+}
+
+void Player::initServiceObject()
+{
+    m_javaService = QAndroidJniObject::callStaticObjectMethod
+            ("com/zdonik/musicplayer/PlayerService", "instance",
+             "()Lcom/zdonik/musicplayer/PlayerService;");
 }
 
 bool Player::load()
@@ -137,8 +140,7 @@ void Player::setPlay(bool play)
     else
         m_mediaPlayer.pause();
 
-//   m_javaService.callMethod<void>("com/zdonik/musicplayer/PlayerService",
-//                                  "setPlay", "(Z)V", play);
+   m_javaService.callMethod<void>("setPlay", "(Z)V", play);
 }
 
 void Player::next()

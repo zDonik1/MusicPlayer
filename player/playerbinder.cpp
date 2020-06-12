@@ -26,6 +26,8 @@ bool PlayerBinder::onTransact(int code, const QAndroidParcel &data,
     }
 
     case MessageType::LOAD_PLAYLIST: {
+        m_player.initServiceObject();
+
         // checking whether the service just started or is resuming
         if (m_player.isStopped()) {
             auto map = data.readVariant().toMap();

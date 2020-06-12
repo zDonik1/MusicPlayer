@@ -16,6 +16,7 @@ public:
 
     void debug(const QString &message); // helper function for debugging service
     QList<QMediaContent> varListToMediaContentList(const QVariantList &list);
+    void initServiceObject();
     bool load();
     void save();
 

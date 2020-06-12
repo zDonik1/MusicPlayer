@@ -60,8 +60,6 @@ public class PlayerService extends QtService {
     }
 
     private void showNotification() {
-        CharSequence text = "Music started";
-
         Intent prevIntent = new Intent(this, PlayerActionReceiver.class);
         prevIntent.setAction("com.zdonik.musicplayer.PREVIOUS");
         prevPendingIntent = PendingIntent.getBroadcast(this, 0, prevIntent, 0);
@@ -90,9 +88,9 @@ public class PlayerService extends QtService {
 //            .setLargeIcon(albumArtBitmap)
             .setOnlyAlertOnce(true)
             .setSmallIcon(17301635)  // the status icon
-            .setTicker(text)  // the status text
-            .setContentTitle("Best music started")  // the label of the entry
-            .setContentText(text)  // the contents of the entry
+            .setTicker("Music started")  // the status text
+            .setContentTitle("Playing music")  // the label of the entry
+            .setContentText("")  // the contents of the entry
             .setContentIntent(contentIntent);  // The intent to send when the entry is clicked
         setActions();
 
