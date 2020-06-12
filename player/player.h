@@ -3,6 +3,7 @@
 #include <QMediaPlayer>
 #include <QMediaPlaylist>
 #include <QAndroidBinder>
+#include <QAndroidJniObject>
 #include <QTimer>
 
 class Player : public QObject
@@ -18,12 +19,15 @@ public:
     bool load();
     void save();
 
+    const QAndroidBinder &getServerBinder() const;
+    bool getPlay() const;
+    int musicCount() const;
+    bool isStopped() const;
+
     void setPlaylist(const QList<QMediaContent> &musicUrls);
     void addMusicToPlaylist(const QList<QMediaContent> &musicUrls);
     void clearPlaylist();
     void sendPlaybackState();
-    int musicCount() const;
-    bool isStopped() const;
 
     void setPlay(bool play);
     void next();
@@ -35,7 +39,7 @@ public:
 
     void setServerBinder(const QAndroidBinder &serverBinder);
 
-public slots:
+private slots:
     void onCurrentIndexChanged(int index);
     void onPlayerStateChanged(QMediaPlayer::State state);
     void onPositionTimerTimeout();
@@ -49,6 +53,7 @@ private:
     QMediaPlayer m_mediaPlayer;
     QAndroidBinder m_serverBinder;
     QTimer m_positionTimer;
+    QAndroidJniObject m_javaService;
 
     bool m_shuffle = false;
     bool m_repeat = false;

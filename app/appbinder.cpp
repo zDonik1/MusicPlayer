@@ -1,14 +1,16 @@
 #include "appbinder.h"
 
 #include <QDebug>
+#include <QApplication>
 #include <QAndroidParcel>
 
 #include <messagetype.h>
 #include "datamodel.h"
 #include "appstate.h"
 
-AppBinder::AppBinder(DataModel &dataModel)
-    : m_dataModel(dataModel)
+AppBinder::AppBinder(QApplication &app, DataModel &dataModel)
+    : m_app(app)
+    , m_dataModel(dataModel)
 {
 }
 
@@ -30,6 +32,11 @@ bool AppBinder::onTransact(int code, const QAndroidParcel &data,
 
     case MessageType::POSITION_CHANGED: {
         appState.setCurrentMusicPosition(data.readVariant().toLongLong());
+        break;
+    }
+
+    case MessageType::QUIT: {
+        m_app.quit();
         break;
     }
 

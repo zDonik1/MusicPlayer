@@ -1,6 +1,7 @@
 #include "player.h"
 
 #include <QAndroidParcel>
+#include <QAndroidJniObject>
 #include <QRandomGenerator>
 #include <QFile>
 #include <QDataStream>
@@ -18,6 +19,10 @@ Player::Player()
 
     m_mediaPlayer.setPlaylist(&m_playlist);
     m_positionTimer.setInterval(500);
+
+    m_javaService = QAndroidJniObject::callStaticObjectMethod
+            ("com/zdonik/musicplayer/PlayerService", "instance",
+             "()Lcom/zdonik/musicplayer/PlayerService;");
 }
 
 Player::~Player()
@@ -105,6 +110,16 @@ void Player::sendPlaybackState()
     m_serverBinder.transact(MessageType::PLAY, playData);
 }
 
+const QAndroidBinder &Player::getServerBinder() const
+{
+    return m_serverBinder;
+}
+
+bool Player::getPlay() const
+{
+    return m_mediaPlayer.state() == QMediaPlayer::PlayingState;
+}
+
 int Player::musicCount() const
 {
     return m_playlist.mediaCount();
@@ -121,6 +136,9 @@ void Player::setPlay(bool play)
         m_mediaPlayer.play();
     else
         m_mediaPlayer.pause();
+
+//   m_javaService.callMethod<void>("com/zdonik/musicplayer/PlayerService",
+//                                  "setPlay", "(Z)V", play);
 }
 
 void Player::next()

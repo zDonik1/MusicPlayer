@@ -101,6 +101,7 @@ macx {
 }
 
 DISTFILES += \
+    android/src/com/zdonik/musicplayer/PlayerActionReceiver.java \
     android/src/com/zdonik/musicplayer/PlayerService.java \
     qml/Logic.qml \
     qml/components/FileBaseDelegate.qml \

@@ -1,15 +1,16 @@
 #include "appconnection.h"
 
 #include <QDebug>
+#include <QApplication>
 #include <QAndroidParcel>
 
 #include <messagetype.h>
 #include "datamodel.h"
 #include "appstate.h"
 
-AppConnection::AppConnection(DataModel &dataModel)
+AppConnection::AppConnection(QApplication &app, DataModel &dataModel)
     : m_dataModel(dataModel)
-    , m_serverBinder(dataModel)
+    , m_serverBinder(app, dataModel)
 {
 }
 

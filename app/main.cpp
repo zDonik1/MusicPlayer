@@ -29,13 +29,14 @@ int main(int argc, char *argv[])
                 QtAndroid::androidActivity().object());
     qDebug() << "~~~ ending call startService";
 
-    // Initializing app objects
+    // Initializing random objects
     DatabaseManager databaseManager;
     AppState appState(*databaseManager.getSettingsDAO());
     DataModel dataModel(databaseManager, appState);
+    QApplication app(argc, argv);
 
     // Connecting to service
-    AppConnection connection(dataModel);
+    AppConnection connection(app, dataModel);
     qDebug() << "~~~  try to bind service";
     if (QtAndroid::bindService(
                     QAndroidIntent(QtAndroid::androidActivity(),
@@ -46,7 +47,6 @@ int main(int argc, char *argv[])
     }
 
     // Initializing felgo application
-    QApplication app(argc, argv);
     FelgoApplication felgo;
     felgo.setPreservePlatformFonts(true);
 

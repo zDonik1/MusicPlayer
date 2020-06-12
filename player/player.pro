@@ -1,7 +1,7 @@
 TEMPLATE = lib
 TARGET = player
 CONFIG += dll
-QT += core androidextras multimedia sql
+QT += core androidextras multimedia
 
 SOURCES += \
     main.cpp \

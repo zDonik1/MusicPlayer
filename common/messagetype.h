@@ -10,6 +10,7 @@ enum MessageType
     POSITION_CHANGED,
     MUSIC_ADDED,
     CURRENT_PLAYLIST_DELETED,
+    QUIT,
 
     PLAY,
     NEXT,
