@@ -15,11 +15,8 @@
 #include "datamodel.h"
 #include "musicimageprovider.h"
 
-int main(int argc, char *argv[])
+void startService(AppConnection &connection)
 {
-    qmlRegisterType<DirModel>("Models", 1, 0, "DirModel");
-    qmlRegisterType<PlaylistModel>("Models", 1, 0, "PlaylistModel");
-
     // Starting service
     qDebug() << "~~~ calling startService";
     QAndroidJniObject::callStaticMethod<void>(
@@ -29,14 +26,7 @@ int main(int argc, char *argv[])
                 QtAndroid::androidActivity().object());
     qDebug() << "~~~ ending call startService";
 
-    // Initializing random objects
-    DatabaseManager databaseManager;
-    AppState appState(*databaseManager.getSettingsDAO());
-    DataModel dataModel(databaseManager, appState);
-    QApplication app(argc, argv);
-
     // Connecting to service
-    AppConnection connection(app, dataModel);
     qDebug() << "~~~  try to bind service";
     if (QtAndroid::bindService(
                     QAndroidIntent(QtAndroid::androidActivity(),
@@ -45,8 +35,22 @@ int main(int argc, char *argv[])
     {
         qDebug() << "~~~  binding success";
     }
+}
+
+int main(int argc, char *argv[])
+{
+    qmlRegisterType<DirModel>("Models", 1, 0, "DirModel");
+    qmlRegisterType<PlaylistModel>("Models", 1, 0, "PlaylistModel");
+
+    // Initializing random objects
+    DatabaseManager databaseManager;
+    AppState appState(*databaseManager.getSettingsDAO());
+    DataModel dataModel(databaseManager, appState);
+    AppConnection connection(dataModel);
+    startService(connection);
 
     // Initializing felgo application
+    QApplication app(argc, argv);
     FelgoApplication felgo;
     felgo.setPreservePlatformFonts(true);
 

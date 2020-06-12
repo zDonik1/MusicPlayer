@@ -28,11 +28,13 @@ public class PlayerService extends QtService {
 
     private static boolean isPlaying = false;
     private static Notification.Builder notificationBuilder;
+    private boolean isForeground = false;
 
     private PendingIntent prevPendingIntent;
     private PendingIntent pausePendingIntent;
     private PendingIntent nextPendingIntent;
     private PendingIntent closePendingIntent;
+    private PendingIntent contentIntent;
 
     public static PlayerService instance() {
         return service;
@@ -56,7 +58,7 @@ public class PlayerService extends QtService {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
-        return START_STICKY;
+        return START_NOT_STICKY;
     }
 
     private void showNotification() {
@@ -77,12 +79,13 @@ public class PlayerService extends QtService {
         closePendingIntent = PendingIntent.getBroadcast(this, 0, closeIntent, 0);
 
         // The PendingIntent to launch our activity if the user selects this notification
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
+        contentIntent = PendingIntent.getActivity(this, 0,
             new Intent(this, VPlayActivity.class), 0);
 
-        // Set the info for the views that show in the notification panel.
         notificationBuilder = new Notification.Builder(this, CHANNEL_ID)
             .setVisibility(Notification.VISIBILITY_PUBLIC)
+            .setColorized(true)
+            .setColor(0xff273c75)
             .setStyle(new Notification.MediaStyle()
                 .setShowActionsInCompactView(0, 1, 2))
 //            .setLargeIcon(albumArtBitmap)
@@ -95,6 +98,7 @@ public class PlayerService extends QtService {
         setActions();
 
         startForeground(NOTIFICATION, notificationBuilder.build());
+        isForeground = true;
     }
 
     private void createNotificationChannel() {
@@ -102,7 +106,8 @@ public class PlayerService extends QtService {
             CharSequence name = "Music";
             String description = "Notification for music being played";
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+            NotificationChannel channel
+                = new NotificationChannel(CHANNEL_ID,name, importance);
             channel.setDescription(description);
             mNM.createNotificationChannel(channel);
         }
@@ -114,12 +119,18 @@ public class PlayerService extends QtService {
     }
 
     private void updateNotification() {
+        if (!isForeground) {
+            startForeground(NOTIFICATION, notificationBuilder.build());
+            isForeground = true;
+        }
+
         setActions();
         mNM.notify(NOTIFICATION, notificationBuilder.build());
     }
 
     public void quit() {
         stopForeground(true);
+        isForeground = false;
     }
 
     private void setActions() {

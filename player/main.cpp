@@ -37,9 +37,12 @@ JNIEXPORT void JNICALL Java_com_zdonik_musicplayer_NativeControls_next(
 JNIEXPORT void JNICALL Java_com_zdonik_musicplayer_NativeControls_close(
         JNIEnv */*env*/, jobject /*obj*/)
 {
-//    player.save();
+    playerPtr->setPlay(false);
+    QAndroidParcel data;
+    data.writeVariant(false);
+    playerPtr->getServerBinder().transact(MessageType::PLAY, data);
+    playerPtr->save();
     playerPtr->getServerBinder().transact(MessageType::QUIT, QAndroidParcel());
-    qApp->quit();
 }
 
 }

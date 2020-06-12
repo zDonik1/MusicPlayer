@@ -4,13 +4,12 @@
 
 #include "appbinder.h"
 
-class QApplication;
 class DataModel;
 
 class AppConnection : public QAndroidServiceConnection
 {
 public:
-    AppConnection(QApplication &app, DataModel &dataModel);
+    AppConnection(DataModel &dataModel);
 
     void onServiceConnected(const QString &name,
                             const QAndroidBinder &serviceBinder) override;

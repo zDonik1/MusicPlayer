@@ -33,8 +33,8 @@ public class PlayerActionReceiver extends BroadcastReceiver {
             return;
         }
         if (action.equals("com.zdonik.musicplayer.CLOSE")) {
-            PlayerService.instance().quit();
             NativeControls.close();
+            PlayerService.instance().quit();
             return;
         }
     }
